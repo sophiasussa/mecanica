@@ -57,8 +57,8 @@ public class MainLayout extends AppLayout {
         SideNav nav = new SideNav();
 
         nav.addItem(new SideNavItem("Cliente", ClienteView.class, VaadinIcon.GROUP.create()));
-        nav.addItem(new SideNavItem("Mecanico", MecanicoView.class, VaadinIcon.MALE.create()));
-        nav.addItem(new SideNavItem("Veiculo", VeiculoView.class, VaadinIcon.CAR.create()));
+        nav.addItem(new SideNavItem("Mecânico", MecanicoView.class, VaadinIcon.MALE.create()));
+        nav.addItem(new SideNavItem("Veículo", VeiculoView.class, VaadinIcon.CAR.create()));
         nav.addItem(new SideNavItem("Peças", PeçasView.class, VaadinIcon.COG.create()));
         nav.addItem(new SideNavItem("Serviços", ServiçosView.class, VaadinIcon.HANDSHAKE.create()));
         nav.addItem(new SideNavItem("OS", OSView.class, VaadinIcon.FILE_TEXT.create()));
