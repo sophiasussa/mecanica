@@ -12,6 +12,7 @@ import com.vaadin.flow.component.html.Footer;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.Header;
 import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.Scroller;
 import com.vaadin.flow.component.sidenav.SideNav;
 import com.vaadin.flow.component.sidenav.SideNavItem;
@@ -43,7 +44,7 @@ public class MainLayout extends AppLayout {
     }
 
     private void addDrawerContent() {
-        Span appName = new Span("My App");
+        Span appName = new Span("Menu");
         appName.addClassNames(LumoUtility.FontWeight.SEMIBOLD, LumoUtility.FontSize.LARGE);
         Header header = new Header(appName);
 
@@ -55,12 +56,12 @@ public class MainLayout extends AppLayout {
     private SideNav createNavigation() {
         SideNav nav = new SideNav();
 
-        nav.addItem(new SideNavItem("Cliente", ClienteView.class, LineAwesomeIcon.PENCIL_RULER_SOLID.create()));
-        nav.addItem(new SideNavItem("Mecanico", MecanicoView.class, LineAwesomeIcon.PENCIL_RULER_SOLID.create()));
-        nav.addItem(new SideNavItem("Veiculo", VeiculoView.class, LineAwesomeIcon.PENCIL_RULER_SOLID.create()));
-        nav.addItem(new SideNavItem("Peças", PeçasView.class, LineAwesomeIcon.PENCIL_RULER_SOLID.create()));
-        nav.addItem(new SideNavItem("Serviços", ServiçosView.class, LineAwesomeIcon.PENCIL_RULER_SOLID.create()));
-        nav.addItem(new SideNavItem("OS", OSView.class, LineAwesomeIcon.PENCIL_RULER_SOLID.create()));
+        nav.addItem(new SideNavItem("Cliente", ClienteView.class, VaadinIcon.GROUP.create()));
+        nav.addItem(new SideNavItem("Mecanico", MecanicoView.class, VaadinIcon.MALE.create()));
+        nav.addItem(new SideNavItem("Veiculo", VeiculoView.class, VaadinIcon.CAR.create()));
+        nav.addItem(new SideNavItem("Peças", PeçasView.class, VaadinIcon.COG.create()));
+        nav.addItem(new SideNavItem("Serviços", ServiçosView.class, VaadinIcon.HANDSHAKE.create()));
+        nav.addItem(new SideNavItem("OS", OSView.class, VaadinIcon.FILE_TEXT.create()));
 
         return nav;
     }
