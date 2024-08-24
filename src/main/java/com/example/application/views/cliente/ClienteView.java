@@ -20,19 +20,31 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
 import com.vaadin.flow.theme.lumo.LumoUtility.Gap;
 
+import controller.ClienteController;
+import model.Cliente;
+
 @PageTitle("Cliente")
 @Route(value = "", layout = MainLayout.class)
 @RouteAlias(value = "", layout = MainLayout.class)
 public class ClienteView extends Composite<VerticalLayout> {
 
+    
+private ClienteController clienteController;
+    private TextField textField;
+    private TextField textField2;
+    private TextField textField3;
+    private TextField textField4;
+    private TextField textField5;
+
     public ClienteView() {
+        // clienteController = new ClienteController();
         FormLayout formLayout2Col = new FormLayout();
-        TextField textField = new TextField();
-        TextField textField2 = new TextField();
+        textField = new TextField();
+         textField2 = new TextField();
         FormLayout formLayout3Col = new FormLayout();
-        TextField textField3 = new TextField();
-        TextField textField4 = new TextField();
-        TextField textField5 = new TextField();
+         textField3 = new TextField();
+         textField4 = new TextField();
+         textField5 = new TextField();
         VerticalLayout layoutColumn2 = new VerticalLayout();
         Button buttonPrimary = new Button();
         Hr hr = new Hr();
@@ -66,6 +78,10 @@ public class ClienteView extends Composite<VerticalLayout> {
         getContent().setFlexGrow(1.0, layoutColumn2);
         layoutColumn2.setWidth("100%");
         layoutColumn2.getStyle().set("flex-grow", "1");
+        
+        buttonPrimary.addClickListener(e -> saveCliente());
+
+
         buttonPrimary.setText("Salvar");
         buttonPrimary.getStyle().set("border-radius", "25px");
         layoutColumn2.setAlignSelf(FlexComponent.Alignment.END, buttonPrimary);
@@ -104,4 +120,23 @@ public class ClienteView extends Composite<VerticalLayout> {
         layoutRow.add(buttonPrimary2);
         layoutColumn2.add(hr2);
     }
+
+    private void saveCliente() {
+        clienteController = new ClienteController();
+        Cliente cliente = new Cliente();
+        cliente.setNome(textField.getValue());
+        cliente.setEndereco(textField2.getValue());
+        cliente.setCpf(textField3.getValue());
+        cliente.setCidade(textField4.getValue());
+        cliente.setTelefone(textField5.getValue());
+
+        boolean success = clienteController.saveCliente(cliente);
+        System.out.println("Entrou em salvar");
+        if (success) {
+            System.out.println("Cliente salvo com sucesso!");
+        } else {
+            System.out.println("Erro ao salvar cliente.");
+        }
+    }
+    
 }
