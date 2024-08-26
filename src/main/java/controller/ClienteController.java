@@ -52,4 +52,13 @@ public class ClienteController {
             return false;
         }
     }
+
+    public Cliente getClienteById(int id) {
+        return clienteRepository.getClienteById(id);
+    }
+
+    public List<Cliente> searchClientes(String searchTerm) {
+        return clienteRepository.searchClientes(searchTerm);
+    }
+
 }

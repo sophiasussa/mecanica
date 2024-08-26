@@ -19,23 +19,34 @@ public class ClienteRepository {
     
     
 
-    public boolean saveCliente(Cliente cliente) {
-        String sql = "INSERT INTO Cliente (id, nome, endereco, cpf, cidade, telefone) VALUES (?, ?, ?, ?, ?, ?)";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setInt(1, cliente.getId());
-            stmt.setString(2, cliente.getNome());
-            stmt.setString(3, cliente.getEndereco());
-            stmt.setString(4, cliente.getCpf());
-            stmt.setString(5, cliente.getCidade());
-            stmt.setString(6, cliente.getTelefone());
-
-            int rowsInserted = stmt.executeUpdate();
-            return rowsInserted > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
+        public boolean saveCliente(Cliente cliente) {
+            String sql = "INSERT INTO Cliente (nome, endereco, cpf, cidade, telefone) VALUES (?, ?, ?, ?, ?)";
+            try (PreparedStatement stmt = connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
+                // Não define o ID, pois é auto-incremento
+                stmt.setString(1, cliente.getNome());
+                stmt.setString(2, cliente.getEndereco());
+                stmt.setString(3, cliente.getCpf());
+                stmt.setString(4, cliente.getCidade());
+                stmt.setString(5, cliente.getTelefone());
+        
+                int rowsInserted = stmt.executeUpdate();
+        
+                if (rowsInserted > 0) {
+                    try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
+                        if (generatedKeys.next()) {
+                            int generatedId = generatedKeys.getInt(1);
+                            cliente.setId(generatedId); // Defina o ID no objeto cliente
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            } catch (SQLException e) {
+                e.printStackTrace();
+                return false;
+            }
         }
-    }
+        
 
     public List<String> getAllNomes() {
     List<String> nomes = new ArrayList<>();
@@ -149,6 +160,54 @@ public class ClienteRepository {
             return null; // Erro
         }
     }
+
+    public Cliente getClienteById(int id) {
+        String sql = "SELECT * FROM Cliente WHERE id = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, id);
+            ResultSet result = stmt.executeQuery();
+            if (result.next()) {
+                Cliente cliente = new Cliente();
+                cliente.setId(result.getInt("id"));
+                cliente.setNome(result.getString("nome"));
+                cliente.setEndereco(result.getString("endereco"));
+                cliente.setCpf(result.getString("cpf"));
+                cliente.setCidade(result.getString("cidade"));
+                cliente.setTelefone(result.getString("telefone"));
+                return cliente;
+            } else {
+                return null; // Cliente não encontrado
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null; // Em caso de erro
+        }
+    }
+
+    public List<Cliente> searchClientes(String searchTerm) {
+        List<Cliente> clientes = new ArrayList<>();
+        String sql = "SELECT * FROM Cliente WHERE nome LIKE ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, "%" + searchTerm + "%"); // Pesquisa com LIKE
+            ResultSet result = stmt.executeQuery();
+            while (result.next()) {
+                Cliente cliente = new Cliente();
+                cliente.setId(result.getInt("id"));
+                cliente.setNome(result.getString("nome"));
+                cliente.setEndereco(result.getString("endereco"));
+                cliente.setCpf(result.getString("cpf"));
+                cliente.setCidade(result.getString("cidade"));
+                cliente.setTelefone(result.getString("telefone"));
+                clientes.add(cliente);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return clientes;
+    }
+
+    
+    
         
 }
 
