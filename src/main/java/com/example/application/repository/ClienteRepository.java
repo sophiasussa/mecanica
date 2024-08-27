@@ -206,6 +206,24 @@ public class ClienteRepository {
         return clientes;
     }
 
+    public List<Cliente> getAllClientes() {
+        List<Cliente> clientes = new ArrayList<>();
+        String sql = "SELECT id, nome FROM Clientes"; // Adjust the table and column names accordingly
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            ResultSet result = stmt.executeQuery();
+            while (result.next()) {
+                Cliente cliente = new Cliente();
+                cliente.setId(result.getInt("id"));
+                cliente.setNome(result.getString("nome"));
+                clientes.add(cliente);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return clientes;
+    }
     
     
         
