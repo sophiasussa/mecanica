@@ -5,78 +5,176 @@ import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.formlayout.FormLayout;
+import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.Hr;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
-import com.vaadin.flow.component.orderedlayout.FlexComponent.JustifyContentMode;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.theme.lumo.LumoUtility.Gap;
+import controller.ServicosController;
+import model.Servicos;
+
+import java.util.List;
 
 @PageTitle("Serviços")
 @Route(value = "my-view4", layout = MainLayout.class)
-public class ServiçosView extends Composite<VerticalLayout> {
+public class ServiçosView  extends Composite<VerticalLayout> {
 
-    public ServiçosView() {
-        FormLayout formLayout2Col = new FormLayout();
-        TextField textField = new TextField();
-        TextField textField2 = new TextField();
-        VerticalLayout layoutColumn2 = new VerticalLayout();
-        Button buttonPrimary = new Button();
-        Hr hr = new Hr();
-        HorizontalLayout layoutRow = new HorizontalLayout();
-        TextField textField3 = new TextField();
-        Button buttonPrimary2 = new Button();
-        Hr hr2 = new Hr();
-        VerticalLayout layout = new VerticalLayout();
-        getContent().setWidth("100%");
-        getContent().getStyle().set("flex-grow", "1");
-        formLayout2Col.setWidth("100%");
-        textField.setPlaceholder("Descrição");
-        textField.addClassName("rounded-text-field");
-        textField.setWidth("min-content");
-        textField2.setPlaceholder("Valor");
-        textField2.addClassName("rounded-text-field");
-        textField2.setWidth("min-content");
-        layoutColumn2.setWidthFull();
-        getContent().setFlexGrow(1.0, layoutColumn2);
-        layoutColumn2.setWidth("100%");
-        layoutColumn2.getStyle().set("flex-grow", "1");
-        layoutColumn2.setJustifyContentMode(JustifyContentMode.START);
-        layoutColumn2.setAlignItems(Alignment.END);
-        buttonPrimary.setText("Salvar");
-        buttonPrimary.getStyle().set("border-radius", "25px");
-        buttonPrimary.setWidth("min-content");
-        buttonPrimary.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        layoutRow.setWidthFull();
-        layoutColumn2.setFlexGrow(1.0, layoutRow);
-        layoutRow.addClassName(Gap.MEDIUM);
-        layoutRow.setWidth("100%");
-        layoutRow.setHeight("70px");
-        layoutRow.setAlignItems(Alignment.END);
-        layoutRow.setJustifyContentMode(JustifyContentMode.END);
-        textField3.setPlaceholder("Pesquisar");
-        textField3.addClassName("rounded-text-field");
-        textField3.setWidth("min-content");
-        buttonPrimary2.setIcon(VaadinIcon.SEARCH.create());
-        buttonPrimary2.getStyle().set("border-radius", "50%");
-        buttonPrimary2.setWidth("min-content");
-        buttonPrimary2.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        hr.getStyle().set("box-shadow", "0 1px 4px rgba(0, 0, 0, 0.2)");
-        hr2.getStyle().set("box-shadow", "0 -1px 4px rgba(0, 0, 0, 0.2)");
-        formLayout2Col.add(textField);
-        formLayout2Col.add(textField2);
-        layout.add(formLayout2Col);
-        getContent().add(layout);
-        getContent().add(layoutColumn2);
-        layoutColumn2.add(buttonPrimary);
-        layoutColumn2.add(hr);
-        layoutColumn2.add(layoutRow);
-        layoutRow.add(textField3);
-        layoutRow.add(buttonPrimary2);
-        layoutColumn2.add(hr2);
+    private ServicosController servicosController;
+    private TextField descricaoField;
+    private TextField precoField;
+    private Grid<Servicos> grid;
+    private Integer servicoId;  // Armazena o ID do serviço em edição
+    private TextField searchField; // Campo de pesquisa
+    private Button searchButton; // Botão de pesquisa
+
+    public ServiçosView () {
+        servicosController = new ServicosController();
+
+        // Formulário
+        FormLayout formLayout = new FormLayout();
+        descricaoField = new TextField("Descrição");
+        precoField = new TextField("Valor");
+
+        descricaoField.addClassName("rounded-text-field");
+        precoField.addClassName("rounded-text-field");
+
+        descricaoField.setWidthFull();
+        precoField.setWidthFull();
+
+        formLayout.setWidth("100%");
+        formLayout.add(descricaoField, precoField);
+
+        // Botão Salvar
+        Button saveButton = new Button("Salvar");
+        saveButton.getStyle().set("border-radius", "25px");
+        saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        saveButton.addClickListener(e -> saveOrUpdateServico());
+
+        // Botão de pesquisa
+        searchField = new TextField("Pesquisar");
+        searchField.addClassName("rounded-text-field");
+        searchButton = new Button(VaadinIcon.SEARCH.create());
+        searchButton.getStyle().set("border-radius", "50%");
+        searchButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        searchButton.addClickListener(e -> searchServicos());
+
+        // Layout para os botões
+        VerticalLayout buttonLayout = new VerticalLayout(saveButton, new Hr(), new HorizontalLayout(searchField, searchButton), new Hr());
+        buttonLayout.setAlignItems(Alignment.END);
+        buttonLayout.setWidthFull();
+
+        // Grid para listar os serviços
+        grid = createGrid();
+
+        // Adicionando os componentes ao layout principal
+        getContent().add(formLayout, buttonLayout, grid);
+    }
+
+    private Grid<Servicos> createGrid() {
+        grid = new Grid<>(Servicos.class, false);
+        grid.addColumn(Servicos::getDescricaoServico).setHeader("Descrição").setSortable(true);
+        grid.addColumn(Servicos::getPreco).setHeader("Valor").setSortable(true);
+
+        grid.addComponentColumn(servico -> {
+            Button deleteButton = new Button(VaadinIcon.TRASH.create(), e -> deleteServico(servico));
+            deleteButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
+            return deleteButton;
+        }).setHeader("Ações");
+
+        grid.addItemDoubleClickListener(e -> editServico(e.getItem()));
+
+        grid.setItems(servicosController.getAllServicos());
+        grid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
+
+        return grid;
+    }
+
+    private void saveOrUpdateServico() {
+        String descricao = descricaoField.getValue();
+        double preco;
+
+        try {
+            preco = Double.parseDouble(precoField.getValue());
+        } catch (NumberFormatException e) {
+            Notification.show("Valor inválido.");
+            return;
+        }
+
+        if (descricao == null || descricao.isEmpty()) {
+            Notification.show("Descrição não pode estar vazia.");
+            return;
+        }
+
+        Servicos servico = new Servicos();
+        servico.setDescricaoServico(descricao);
+        servico.setPreco(preco);
+
+        boolean success;
+        if (servicoId != null && servicoId > 0) {
+            servico.setId(servicoId);
+            success = servicosController.updateServicos(servico);
+            if (success) {
+                Notification.show("Serviço atualizado com sucesso!");
+            } else {
+                Notification.show("Falha ao atualizar o serviço.");
+            }
+        } else {
+            success = servicosController.saveServicos(servico);
+            if (success) {
+                Notification.show("Serviço salvo com sucesso!");
+            } else {
+                Notification.show("Falha ao salvar o serviço.");
+            }
+        }
+
+        if (success) {
+            clearForm();
+            refreshGrid();
+        }
+    }
+
+    private void searchServicos() {
+        String searchTerm = searchField.getValue();
+        List<Servicos> servicos;
+
+        if (searchTerm == null || searchTerm.isEmpty()) {
+            servicos = servicosController.getAllServicos();
+        } else {
+            servicos = servicosController.searchServicos(searchTerm);
+        }
+
+        grid.setItems(servicos);
+    }
+
+    private void deleteServico(Servicos servico) {
+        boolean success = servicosController.deleteServicos(servico);
+        if (success) {
+            refreshGrid();
+        } else {
+            System.out.println("Erro ao excluir serviço.");
+        }
+    }
+
+    private void editServico(Servicos servico) {
+        servicoId = servico.getId(); // Armazena o ID do serviço em edição
+        descricaoField.setValue(servico.getDescricaoServico());
+        precoField.setValue(String.valueOf(servico.getPreco()));
+    }
+
+    private void refreshGrid() {
+        List<Servicos> servicos = servicosController.getAllServicos();
+        grid.setItems(servicos);
+    }
+
+    private void clearForm() {
+        servicoId = null; // Reseta o ID do serviço em edição
+        descricaoField.clear();
+        precoField.clear();
     }
 }
