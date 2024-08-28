@@ -208,7 +208,7 @@ public class ClienteRepository {
 
     public List<Cliente> getAllClientes() {
         List<Cliente> clientes = new ArrayList<>();
-        String sql = "SELECT id, nome FROM Clientes"; // Adjust the table and column names accordingly
+        String sql = "SELECT id, nome FROM Cliente"; // Adjust the table and column names accordingly
 
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             ResultSet result = stmt.executeQuery();

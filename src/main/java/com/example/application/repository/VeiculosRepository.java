@@ -18,7 +18,7 @@ public class VeiculosRepository {
     }
 
     public boolean saveVeiculo(Veiculo veiculo) {
-        String sql = "INSERT INTO Veiculos (descricaoVeiculo, placa, anoModelo, idCliente, imagem) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Veiculo (descricao_veiculo, placa, ano_modelo, id_cliente, imagem) VALUES (?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
             stmt.setString(1, veiculo.getDescricaoVeiculo());
             stmt.setString(2, veiculo.getPlaca());
@@ -46,16 +46,16 @@ public class VeiculosRepository {
 
     public List<Veiculo> getAllVeiculos() {
         List<Veiculo> veiculos = new ArrayList<>();
-        String sql = "SELECT * FROM Veiculos";
+        String sql = "SELECT * FROM Veiculo";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             ResultSet result = stmt.executeQuery();
             while (result.next()) {
                 Veiculo veiculo = new Veiculo();
                 veiculo.setId(result.getInt("id"));
-                veiculo.setDescricaoVeiculo(result.getString("descricaoVeiculo"));
+                veiculo.setDescricaoVeiculo(result.getString("descricao_veiculo"));
                 veiculo.setPlaca(result.getString("placa"));
-                veiculo.setAnoModelo(result.getString("anoModelo"));
-                veiculo.setIdCliente(result.getInt("idCliente"));
+                veiculo.setAnoModelo(result.getString("ano_modelo"));
+                veiculo.setIdCliente(result.getInt("id_cliente"));
                 veiculo.setImagem(result.getBytes("imagem"));
                 veiculos.add(veiculo);
             }
@@ -66,7 +66,7 @@ public class VeiculosRepository {
     }
 
     public boolean updateVeiculo(Veiculo veiculo) {
-        String sql = "UPDATE Veiculos SET descricaoVeiculo = ?, placa = ?, anoModelo = ?, idCliente = ?, imagem = ? WHERE id = ?";
+        String sql = "UPDATE Veiculo SET descricao_veiculo = ?, placa = ?, ano_modelo = ?, id_cliente = ?, imagem = ? WHERE id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, veiculo.getDescricaoVeiculo());
             stmt.setString(2, veiculo.getPlaca());
@@ -84,7 +84,7 @@ public class VeiculosRepository {
     }
 
     public boolean deleteVeiculo(Veiculo veiculo) {
-        String sql = "DELETE FROM Veiculos WHERE id = ?";
+        String sql = "DELETE FROM Veiculo WHERE id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, veiculo.getId());
             int rowsDeleted = stmt.executeUpdate();
@@ -97,17 +97,17 @@ public class VeiculosRepository {
 
     public List<Veiculo> searchVeiculos(String searchTerm) {
         List<Veiculo> veiculos = new ArrayList<>();
-        String sql = "SELECT * FROM Veiculos WHERE descricaoVeiculo LIKE ?";
+        String sql = "SELECT * FROM Veiculo WHERE descricao_veiculo LIKE ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, "%" + searchTerm + "%");
             ResultSet result = stmt.executeQuery();
             while (result.next()) {
                 Veiculo veiculo = new Veiculo();
                 veiculo.setId(result.getInt("id"));
-                veiculo.setDescricaoVeiculo(result.getString("descricaoVeiculo"));
+                veiculo.setDescricaoVeiculo(result.getString("descricao_veiculo"));
                 veiculo.setPlaca(result.getString("placa"));
-                veiculo.setAnoModelo(result.getString("anoModelo"));
-                veiculo.setIdCliente(result.getInt("idCliente"));
+                veiculo.setAnoModelo(result.getString("ano_modelo"));
+                veiculo.setIdCliente(result.getInt("id_cliente"));
                 veiculo.setImagem(result.getBytes("imagem"));
                 veiculos.add(veiculo);
             }

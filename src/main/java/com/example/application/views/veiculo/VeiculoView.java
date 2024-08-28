@@ -7,6 +7,8 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
+import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.Hr;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
@@ -19,108 +21,228 @@ import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.component.upload.receivers.MemoryBuffer;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.theme.lumo.LumoUtility.Gap;
-import java.io.IOException;  // Add this import
+import model.Cliente;
+import model.Veiculo;
+import controller.ClienteController;
+import controller.VeiculosController;
+
+import java.io.IOException;
+import java.util.List;
 
 @PageTitle("Veiculo")
 @Route(value = "my-view2", layout = MainLayout.class)
 public class VeiculoView extends Composite<VerticalLayout> {
 
+    private VeiculosController veiculosController;
+    private ClienteController clienteController;
+    private TextField descricaoField;
+    private TextField placaField;
+    private TextField anoField;
+    private ComboBox<Cliente> clienteComboBox;
+    private Grid<Veiculo> grid;
+    private TextField searchField;
+    private Button searchButton;
+    private Integer veiculoId;
+    private byte[] imageBytes;
+
     public VeiculoView() {
+        veiculosController = new VeiculosController();
+        clienteController = new ClienteController();
+
+        // Formulário
         FormLayout formLayout3Col = new FormLayout();
-        TextField descricaoField = new TextField();
-        TextField placaField = new TextField();
-        TextField anoField = new TextField();
+        descricaoField = new TextField("Descrição");
+        placaField = new TextField("Placa");
+        anoField = new TextField("Ano");
 
-        // Dropdown for Clients
-        ComboBox<String> clienteComboBox = new ComboBox<>("Cliente");
-        clienteComboBox.setItems("Cliente 1", "Cliente 2", "Cliente 3"); // Example items
+        descricaoField.addClassName("rounded-text-field");
+        placaField.addClassName("rounded-text-field");
+        anoField.addClassName("rounded-text-field");
 
-        // Drag-and-drop upload for image
+        descricaoField.setWidthFull();
+        placaField.setWidthFull();
+        anoField.setWidthFull();
+
+        // Dropdown para Clientes
+        clienteComboBox = new ComboBox<>("Cliente");
+        List<Cliente> clientes = veiculosController.getAllClientes();
+        if (clientes != null) {
+            clienteComboBox.setItems(clientes);
+            clienteComboBox.setItemLabelGenerator(Cliente::getNome);
+        } else {
+            Notification.show("Erro ao carregar clientes.", 3000, Notification.Position.MIDDLE);
+        }
+
+        // Upload de imagem
         MemoryBuffer buffer = new MemoryBuffer();
         Upload upload = new Upload(buffer);
         upload.setAcceptedFileTypes("image/jpeg", "image/png", "image/gif");
-        upload.setMaxFiles(1); // Limit to one file
-        upload.setMaxFileSize(5 * 1024 * 1024); // 5 MB
+        upload.setMaxFiles(1);
+        upload.setMaxFileSize(5 * 1024 * 1024);
 
         upload.addSucceededListener(event -> {
             try {
-                byte[] imageBytes = buffer.getInputStream().readAllBytes();
-                // Here you can handle the imageBytes, e.g., set it to a Veiculo object
+                imageBytes = buffer.getInputStream().readAllBytes();
+                // Aqui você pode processar a imagem, por exemplo, salvá-la no objeto Veiculo
             } catch (IOException e) {
-                e.printStackTrace(); // Handle the exception or log it appropriately
-                Notification.show("Failed to upload image: " + e.getMessage(), 3000, Notification.Position.MIDDLE);
+                e.printStackTrace();
+                Notification.show("Falha ao fazer upload da imagem: " + e.getMessage(), 3000, Notification.Position.MIDDLE);
             }
         });
 
-
-        VerticalLayout layoutColumn2 = new VerticalLayout();
-        Button buttonPrimary = new Button();
-        Hr hr = new Hr();
-        HorizontalLayout layoutRow = new HorizontalLayout();
-        TextField searchField = new TextField();
-        Button searchButton = new Button();
-        Hr hr2 = new Hr();
-        VerticalLayout layoutColumn3 = new VerticalLayout();
-        VerticalLayout layout = new VerticalLayout();
-        getContent().setWidth("100%");
-        getContent().getStyle().set("flex-grow", "1");
         formLayout3Col.setWidth("100%");
-        formLayout3Col.setResponsiveSteps(new ResponsiveStep("0", 1), new ResponsiveStep("250px", 2),
-                new ResponsiveStep("500px", 3));
-        descricaoField.setPlaceholder("Descrição");
-        descricaoField.addClassName("rounded-text-field");
-        descricaoField.setWidth("min-content");
-        placaField.setPlaceholder("Placa");
-        placaField.addClassName("rounded-text-field");
-        placaField.setWidth("min-content");
-        anoField.setPlaceholder("Ano");
-        anoField.setWidth("min-content");
-        anoField.addClassName("rounded-text-field");
+        formLayout3Col.setResponsiveSteps(
+            new ResponsiveStep("0", 1),
+            new ResponsiveStep("250px", 2),
+            new ResponsiveStep("500px", 3)
+        );
+        formLayout3Col.add(descricaoField, placaField, anoField, clienteComboBox, upload);
 
-        // Add fields to layout
-        formLayout3Col.add(descricaoField, placaField, anoField);
-        formLayout3Col.add(clienteComboBox, upload); // Add dropdown and upload to the form layout
+        // Botão Salvar
+        Button saveButton = new Button("Salvar");
+        saveButton.getStyle().set("border-radius", "25px");
+        saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        saveButton.addClickListener(e -> saveOrUpdateVeiculo());
 
-        layoutColumn2.setWidthFull();
-        getContent().setFlexGrow(1.0, layoutColumn2);
-        layoutColumn2.setWidth("100%");
-        layoutColumn2.getStyle().set("flex-grow", "1");
-        layoutColumn2.setJustifyContentMode(JustifyContentMode.START);
-        layoutColumn2.setAlignItems(Alignment.END);
-        buttonPrimary.setText("Salvar");
-        buttonPrimary.getStyle().set("border-radius", "25px");
-        buttonPrimary.setWidth("min-content");
-        buttonPrimary.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        layoutRow.setWidthFull();
-        layoutColumn2.setFlexGrow(1.0, layoutRow);
-        layoutRow.addClassName(Gap.MEDIUM);
-        layoutRow.setWidth("100%");
-        layoutRow.setHeight("70px");
-        layoutRow.setAlignItems(Alignment.END);
-        layoutRow.setJustifyContentMode(JustifyContentMode.END);
-        searchField.setPlaceholder("Pesquisar");
+        // Botão de pesquisa
+        searchField = new TextField("Pesquisar");
         searchField.addClassName("rounded-text-field");
-        searchField.setWidth("min-content");
-        searchButton.setIcon(VaadinIcon.SEARCH.create());
+        searchButton = new Button(VaadinIcon.SEARCH.create());
         searchButton.getStyle().set("border-radius", "50%");
-        searchButton.setWidth("min-content");
         searchButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        layoutColumn3.setWidthFull();
-        layoutColumn2.setFlexGrow(1.0, layoutColumn3);
-        layoutColumn3.setWidth("100%");
-        layoutColumn3.getStyle().set("flex-grow", "1");
-        hr.getStyle().set("box-shadow", "0 1px 4px rgba(0, 0, 0, 0.2)");
-        hr2.getStyle().set("box-shadow", "0 -1px 4px rgba(0, 0, 0, 0.2)");
-        layout.add(formLayout3Col);
-        getContent().add(layout);
-        getContent().add(layoutColumn2);
-        layoutColumn2.add(buttonPrimary);
-        layoutColumn2.add(hr);
-        layoutColumn2.add(layoutRow);
-        layoutRow.add(searchField);
-        layoutRow.add(searchButton);
-        layoutColumn2.add(hr2);
-        layoutColumn2.add(layoutColumn3);
+        searchButton.addClickListener(e -> searchVeiculos());
+
+        // Layout para os botões
+        VerticalLayout buttonLayout = new VerticalLayout(saveButton, new Hr(), new HorizontalLayout(searchField, searchButton), new Hr());
+        buttonLayout.setAlignItems(Alignment.END);
+        buttonLayout.setWidthFull();
+
+        // Grid para listar os veículos
+        grid = createGrid();
+
+        // Adicionando os componentes ao layout principal
+        getContent().add(formLayout3Col, buttonLayout, grid);
+    }
+
+    private Grid<Veiculo> createGrid() {
+        grid = new Grid<>(Veiculo.class, false);
+        grid.addColumn(Veiculo::getDescricaoVeiculo).setHeader("Descrição").setSortable(true);
+        grid.addColumn(Veiculo::getPlaca).setHeader("Placa").setSortable(true);
+        grid.addColumn(Veiculo::getAnoModelo).setHeader("Ano").setSortable(true);
+        grid.addColumn(veiculo -> veiculo.getIdCliente()).setHeader("Cliente").setSortable(true);
+
+        grid.addComponentColumn(veiculo -> {
+            Button deleteButton = new Button(VaadinIcon.TRASH.create(), e -> deleteVeiculo(veiculo));
+            deleteButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
+            return deleteButton;
+        }).setHeader("Ações");
+
+        grid.addItemDoubleClickListener(e -> editVeiculo(e.getItem()));
+
+        grid.setItems(veiculosController.getAllVeiculos());
+        grid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
+
+        return grid;
+    }
+
+    private void saveOrUpdateVeiculo() {
+        String descricao = descricaoField.getValue();
+        String placa = placaField.getValue();
+        String ano = anoField.getValue();
+        Cliente cliente = clienteComboBox.getValue();
+
+        if (descricao == null || descricao.isEmpty()) {
+            Notification.show("Descrição não pode estar vazia.");
+            return;
+        }
+        if (placa == null || placa.isEmpty()) {
+            Notification.show("Placa não pode estar vazia.");
+            return;
+        }
+        if (ano == null || ano.isEmpty()) {
+            Notification.show("Ano não pode estar vazio.");
+            return;
+        }
+        if (cliente == null) {
+            Notification.show("Selecione um cliente.");
+            return;
+        }
+
+        Veiculo veiculo = new Veiculo();
+        veiculo.setDescricaoVeiculo(descricao);
+        veiculo.setPlaca(placa);
+        veiculo.setAnoModelo(ano);
+        veiculo.setIdCliente(cliente.getId());
+
+        if (imageBytes != null) {
+            veiculo.setImagem(imageBytes);
+        }
+
+        boolean success;
+        if (veiculoId != null && veiculoId > 0) {
+            veiculo.setId(veiculoId);
+            success = veiculosController.updateVeiculo(veiculo);
+            if (success) {
+                Notification.show("Veículo atualizado com sucesso!");
+            } else {
+                Notification.show("Falha ao atualizar o veículo.");
+            }
+        } else {
+            success = veiculosController.saveVeiculo(veiculo);
+            if (success) {
+                Notification.show("Veículo salvo com sucesso!");
+            } else {
+                Notification.show("Falha ao salvar o veículo.");
+            }
+        }
+
+        if (success) {
+            clearForm();
+            refreshGrid();
+        }
+    }
+
+
+    private void searchVeiculos() {
+        String searchTerm = searchField.getValue();
+        List<Veiculo> veiculos;
+
+        if (searchTerm == null || searchTerm.isEmpty()) {
+            veiculos = veiculosController.getAllVeiculos();
+        } else {
+            veiculos = veiculosController.searchVeiculos(searchTerm);
+        }
+
+        grid.setItems(veiculos);
+    }
+
+    private void deleteVeiculo(Veiculo veiculo) {
+        boolean success = veiculosController.deleteVeiculo(veiculo);
+        if (success) {
+            refreshGrid();
+        } else {
+            System.out.println("Erro ao excluir veículo.");
+        }
+    }
+
+    private void editVeiculo(Veiculo veiculo) {
+        veiculoId = veiculo.getId(); // Armazena o ID do veículo em edição
+        descricaoField.setValue(veiculo.getDescricaoVeiculo());
+        placaField.setValue(veiculo.getPlaca());
+        anoField.setValue(veiculo.getAnoModelo());
+        clienteComboBox.setValue(clienteController.getClienteById(veiculo.getIdCliente()));
+    }
+
+    private void refreshGrid() {
+        List<Veiculo> veiculos = veiculosController.getAllVeiculos();
+        grid.setItems(veiculos);
+    }
+
+    private void clearForm() {
+        veiculoId = null; // Reseta o ID do veículo em edição
+        descricaoField.clear();
+        placaField.clear();
+        anoField.clear();
+        clienteComboBox.clear();
     }
 }

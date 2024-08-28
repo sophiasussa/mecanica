@@ -2,17 +2,22 @@ package controller;
 
 
 import com.example.application.repository.VeiculosRepository;
+import com.example.application.repository.ClienteRepository;
 
+import model.Cliente;
 import model.Veiculo;
 import java.util.List;
 
 
 public class VeiculosController {
 private final VeiculosRepository veiculosRepository;
+private final ClienteRepository clienteRepository;
+
 
     public VeiculosController() {
         try {
             this.veiculosRepository = new VeiculosRepository();
+            this.clienteRepository = new ClienteRepository();
         } catch (Exception e) {
             throw new RuntimeException("Erro ao conectar ao banco de dados", e);
         }
@@ -56,5 +61,14 @@ private final VeiculosRepository veiculosRepository;
 
     public List<Veiculo> searchVeiculos(String searchTerm) {
         return veiculosRepository.searchVeiculos(searchTerm);
+    }
+
+    public List<Cliente> getAllClientes() {
+        try {
+            return clienteRepository.getAllClientes();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }
