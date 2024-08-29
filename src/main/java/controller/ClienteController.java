@@ -2,12 +2,11 @@ package controller;
 
 import model.Cliente;
 import java.util.List;
-
 import com.example.application.repository.ClienteRepository;
 
 public class ClienteController {
 
-    private final ClienteRepository clienteRepository;
+    private ClienteRepository clienteRepository;
 
     public ClienteController() {
         try {
@@ -15,6 +14,10 @@ public class ClienteController {
         } catch (Exception e) {
             throw new RuntimeException("Erro ao conectar ao banco de dados", e);
         }
+    }    
+
+    public ClienteController(ClienteRepository clienteRepository) {
+        this.clienteRepository = clienteRepository;
     }
 
     public boolean saveCliente(Cliente cliente) {
@@ -44,13 +47,16 @@ public class ClienteController {
         }
     }
 
+    public boolean isClienteInUse(Cliente cliente) {
+        return clienteRepository.isClienteInUse(cliente);
+    }
+
     public boolean deleteCliente(Cliente cliente) {
-        try {
-            return clienteRepository.delete(cliente);
-        } catch (Exception e) {
-            e.printStackTrace();
+        if (isClienteInUse(cliente)) {
+            System.out.println("Não é possível excluir o cliente. O cliente está associado a um ou mais veículos.");
             return false;
         }
+        return clienteRepository.delete(cliente);
     }
 
     public Cliente getClienteById(int id) {
@@ -60,5 +66,4 @@ public class ClienteController {
     public List<Cliente> searchClientes(String searchTerm) {
         return clienteRepository.searchClientes(searchTerm);
     }
-
 }

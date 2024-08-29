@@ -112,14 +112,14 @@ public class ClienteRepository {
         }
     }
 
-    private boolean isClienteInUse(Cliente cliente) {
-        String sql = "SELECT COUNT(*) FROM Os WHERE cliente_id = ?";
+    public boolean isClienteInUse(Cliente cliente) {
+        String sql = "SELECT COUNT(*) FROM Veiculo WHERE id_cliente = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, cliente.getId());
             ResultSet result = stmt.executeQuery();
             if (result.next()) {
                 int count = result.getInt(1);
-                System.out.println("Cliente ID: " + cliente.getId() + " está associado a " + count + " os.");
+                System.out.println("Cliente ID: " + cliente.getId() + " está associado a " + count + " veículo(s).");
                 return count > 0;
             }
         } catch (SQLException e) {

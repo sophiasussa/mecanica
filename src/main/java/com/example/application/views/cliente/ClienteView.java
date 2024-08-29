@@ -1,5 +1,6 @@
 package com.example.application.views.cliente;
 
+import com.example.application.repository.ClienteRepository;
 import com.example.application.views.MainLayout;
 import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.button.Button;
@@ -210,15 +211,15 @@ public class ClienteView extends Composite<VerticalLayout> {
         grid.setItems(clientes);
     }
 
-    private void deleteCliente(Cliente cliente) {
-        boolean success = clienteController.deleteCliente(cliente);
-        if (success) {
-            refreshGrid();
-        } else {
-            System.out.println("Erro ao excluir cliente.");
+    public boolean deleteCliente(Cliente cliente) {
+        if (clienteController.isClienteInUse(cliente)) {
+            System.out.println("Não é possível excluir o cliente. O cliente está associado a um ou mais veículos.");
+            return false;
         }
+        
+        return clienteController.deleteCliente(cliente);
     }
-
+    
     private void editCliente(Cliente cliente) {
         clienteId = cliente.getId(); // Armazena o ID do cliente em edição
         textField.setValue(cliente.getNome());
