@@ -22,6 +22,7 @@ import com.vaadin.flow.router.RouteAlias;
 
 import controller.ClienteController;
 import model.Cliente;
+import model.User;
 
 import java.util.List;
 
@@ -42,6 +43,14 @@ public class ClienteView extends Composite<VerticalLayout> {
     private Button buttonPrimary2; // Botão de pesquisa
 
     public ClienteView() {
+
+        // // Verifica se o usuário está autenticado
+        // User user = (User) getUI().get().getSession().getAttribute(User.class);
+        // if (user == null) {
+        //     // Redireciona para a tela de login se o usuário não estiver autenticado
+        //     getUI().ifPresent(ui -> ui.navigate("login"));
+        //     return; // Interrompe a execução do construtor se o usuário não estiver autenticado
+        // }
         clienteController = new ClienteController();
 
         // Formulário
