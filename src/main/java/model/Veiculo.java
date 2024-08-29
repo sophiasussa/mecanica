@@ -5,11 +5,11 @@ public class Veiculo {
     private String placa;
     private String ano_modelo;
     private int id_cliente;
-    private byte[] imagem; // Novo atributo para imagem
+    private String imagem; // Novo atributo para imagem
 
     public Veiculo() {}
 
-    public Veiculo(int id, String descricao_veiculo, String placa, String ano_modelo, int id_cliente, byte[] imagem) {
+    public Veiculo(int id, String descricao_veiculo, String placa, String ano_modelo, int id_cliente, String imagem) {
         this.id = id;
         this.descricao_veiculo = descricao_veiculo;
         this.placa = placa;
@@ -59,11 +59,11 @@ public class Veiculo {
         this.id_cliente = id_cliente;
     }
 
-    public byte[] getImagem() {
+    public String getImagem() {
         return imagem;
     }
 
-    public void setImagem(byte[] imagem) {
+    public void setImagem(String imagem) {
         this.imagem = imagem;
     }
 }

@@ -24,7 +24,7 @@ public class VeiculosRepository {
             stmt.setString(2, veiculo.getPlaca());
             stmt.setString(3, veiculo.getAnoModelo());
             stmt.setInt(4, veiculo.getIdCliente());
-            stmt.setBytes(5, veiculo.getImagem());
+            stmt.setString(5, veiculo.getImagem());
 
             int rowsInserted = stmt.executeUpdate();
 
@@ -56,7 +56,7 @@ public class VeiculosRepository {
                 veiculo.setPlaca(result.getString("placa"));
                 veiculo.setAnoModelo(result.getString("ano_modelo"));
                 veiculo.setIdCliente(result.getInt("id_cliente"));
-                veiculo.setImagem(result.getBytes("imagem"));
+                veiculo.setImagem(result.getString("imagem"));
                 veiculos.add(veiculo);
             }
         } catch (SQLException e) {
@@ -72,7 +72,7 @@ public class VeiculosRepository {
             stmt.setString(2, veiculo.getPlaca());
             stmt.setString(3, veiculo.getAnoModelo());
             stmt.setInt(4, veiculo.getIdCliente());
-            stmt.setBytes(5, veiculo.getImagem());
+            stmt.setString(5, veiculo.getImagem());
             stmt.setInt(6, veiculo.getId());
 
             int rowsUpdated = stmt.executeUpdate();
@@ -108,7 +108,7 @@ public class VeiculosRepository {
                 veiculo.setPlaca(result.getString("placa"));
                 veiculo.setAnoModelo(result.getString("ano_modelo"));
                 veiculo.setIdCliente(result.getInt("id_cliente"));
-                veiculo.setImagem(result.getBytes("imagem"));
+                veiculo.setImagem(result.getString("imagem"));
                 veiculos.add(veiculo);
             }
         } catch (SQLException e) {

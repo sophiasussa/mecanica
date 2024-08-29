@@ -25,8 +25,15 @@ import model.Cliente;
 import model.Veiculo;
 import controller.ClienteController;
 import controller.VeiculosController;
+import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.upload.Upload;
+import com.vaadin.flow.component.upload.receivers.MemoryBuffer;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 
 @PageTitle("Veiculo")
@@ -43,7 +50,7 @@ public class VeiculoView extends Composite<VerticalLayout> {
     private TextField searchField;
     private Button searchButton;
     private Integer veiculoId;
-    private byte[] imageBytes;
+    private String image;
 
     public VeiculoView() {
         veiculosController = new VeiculosController();
@@ -82,13 +89,24 @@ public class VeiculoView extends Composite<VerticalLayout> {
 
         upload.addSucceededListener(event -> {
             try {
-                imageBytes = buffer.getInputStream().readAllBytes();
-                // Aqui você pode processar a imagem, por exemplo, salvá-la no objeto Veiculo
+                String fileName = event.getFileName();
+                String uploadDir = "C:/Users/jorda/Downloads/imagensMecanica"; // Defina o diretório de upload
+                File targetFile = new File(uploadDir + fileName);
+                
+                try (InputStream inputStream = buffer.getInputStream()) {
+                    Files.copy(inputStream, targetFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                }
+
+                image = targetFile.getAbsolutePath(); // Caminho absoluto da imagem
+
+                Notification.show("Imagem carregada com sucesso!", 3000, Notification.Position.MIDDLE);
             } catch (IOException e) {
                 e.printStackTrace();
                 Notification.show("Falha ao fazer upload da imagem: " + e.getMessage(), 3000, Notification.Position.MIDDLE);
             }
         });
+    
+    
 
         formLayout3Col.setWidth("100%");
         formLayout3Col.setResponsiveSteps(
@@ -174,8 +192,8 @@ public class VeiculoView extends Composite<VerticalLayout> {
         veiculo.setAnoModelo(ano);
         veiculo.setIdCliente(cliente.getId());
 
-        if (imageBytes != null) {
-            veiculo.setImagem(imageBytes);
+        if (image != null) {
+            veiculo.setImagem(image); // Salva o caminho da imagem
         }
 
         boolean success;
@@ -201,6 +219,7 @@ public class VeiculoView extends Composite<VerticalLayout> {
             refreshGrid();
         }
     }
+
 
 
     private void searchVeiculos() {
