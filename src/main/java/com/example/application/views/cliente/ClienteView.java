@@ -213,11 +213,24 @@ public class ClienteView extends Composite<VerticalLayout> {
 
     public boolean deleteCliente(Cliente cliente) {
         if (clienteController.isClienteInUse(cliente)) {
-            System.out.println("Não é possível excluir o cliente. O cliente está associado a um ou mais veículos.");
+            // Exibe uma notificação ao usuário informando que o cliente está associado a veículos
+            Notification.show("Não é possível excluir o cliente. O cliente está associado a um ou mais veículos.");
             return false;
         }
         
-        return clienteController.deleteCliente(cliente);
+        boolean isDeleted = clienteController.deleteCliente(cliente);
+        
+        if (isDeleted) {
+            // Atualiza a grid para refletir a exclusão do cliente
+            refreshGrid();
+            // Exibe uma notificação ao usuário confirmando a exclusão
+            Notification.show("Cliente excluído com sucesso.");
+        } else {
+            // Se houver algum erro na exclusão, exibe uma notificação ao usuário
+            Notification.show("Erro ao excluir o cliente.");
+        }
+        
+        return isDeleted;
     }
     
     private void editCliente(Cliente cliente) {
