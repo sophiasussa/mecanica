@@ -21,5 +21,10 @@ public class UserController {
     public User login(String username, String password) {
         return userRepository.findByUsernameAndPassword(username, password);
     }
+
+    public boolean register(User user) {
+        return userRepository.save(user);
+    }
+    
     
 }

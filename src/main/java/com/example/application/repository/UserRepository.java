@@ -31,4 +31,20 @@ public class UserRepository {
         }
         return user;
     }
+
+    public boolean save(User user) {
+        try {
+            String query = "INSERT INTO User (username, password) VALUES (?, ?)";
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setString(1, user.getUsername());
+            statement.setString(2, user.getPassword());
+    
+            int rowsInserted = statement.executeUpdate();
+            return rowsInserted > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
 }
