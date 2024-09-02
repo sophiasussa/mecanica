@@ -1,13 +1,20 @@
 package com.example.application.views.peças;
 
 import com.example.application.views.MainLayout;
+import com.vaadin.flow.component.grid.editor.Editor;
+import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
+import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Hr;
+import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.JustifyContentMode;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -16,12 +23,19 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.theme.lumo.LumoUtility.Gap;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
+
+import controller.MarcaController;
+
 import java.util.ArrayList;
 import java.util.List;
+
+import model.Marca;
 
 @PageTitle("Peças")
 @Route(value = "my-view3", layout = MainLayout.class)
 public class PeçasView extends Composite<VerticalLayout> {
+    MarcaController controller = new MarcaController();
 
     public PeçasView() {
         FormLayout formLayout2Col = new FormLayout();
@@ -62,7 +76,7 @@ public class PeçasView extends Composite<VerticalLayout> {
         buttonTertiary.setText("+ Marca");
         buttonTertiary.setWidth("min-content");
         buttonTertiary.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
-        //buttonTertiary.addClickListener(event -> openDialog());
+        buttonTertiary.addClickListener(event -> openDialog());
         layoutColumn2.setWidthFull();
         getContent().setFlexGrow(1.0, layoutColumn2);
         layoutColumn2.setWidth("100%");
@@ -110,46 +124,46 @@ public class PeçasView extends Composite<VerticalLayout> {
 
     }
 
-/*  private void openDialog() {
+    private void openDialog() {
         Dialog dialog = new Dialog();
-        dialog.setWidth("800px"); 
+        dialog.setWidth("800px");
         dialog.setHeight("600px");
 
         FormLayout formLayout = new FormLayout();
         TextField nomeField = new TextField("Nome");
 
-        Grid<Responsavel> grid = new Grid<>(Responsavel.class);
+        Grid<Marca> grid = new Grid<>(Marca.class);
         grid.setColumns("nome");
 
-        List<Responsavel> responsaveis = controller2.pesquisarTodos();
-        grid.setItems(responsaveis);
+        List<Marca> marcas = controller.pesquisarTodos();
+        grid.setItems(marcas);
 
-        Editor<Responsavel> editor = grid.getEditor();
-        Binder<Responsavel> binder = new Binder<>(Responsavel.class);
+        Editor<Marca> editor = grid.getEditor();
+        Binder<Marca> binder = new Binder<>(Marca.class);
         editor.setBinder(binder);
 
         TextField nomeEditor = new TextField();
-        binder.forField(nomeEditor).bind(Responsavel::getNome, Responsavel::setNome);
+        binder.forField(nomeEditor).bind(Marca::getNome, Marca::setNome);
         grid.getColumnByKey("nome").setEditorComponent(nomeEditor);
 
         grid.addItemDoubleClickListener(event -> editor.editItem(event.getItem()));
         editor.addCloseListener(event -> grid.getDataProvider().refreshItem(event.getItem()));
         
-        grid.addComponentColumn(responsavel -> {
+        grid.addComponentColumn(marca -> {
             Button alterarButton = new Button("Alterar", new Icon(VaadinIcon.COG));
             alterarButton.addClickListener(e -> {
                 if (editor.isOpen()) {
                     editor.save();
-                    Responsavel editedResponsavel = editor.getItem();
-                    if (controller2.alterar(editedResponsavel)) {
+                    Marca editedMarca = editor.getItem();
+                    if (controller.update(editedMarca)) {
                         Notification notification = new Notification(
-                                "Responsavel atualizado com sucesso.", 3000);
+                                "Marca atualizado com sucesso.", 3000);
                         notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
                         notification.setPosition(Notification.Position.MIDDLE);
                         notification.open();
                         
-                        responsaveis.clear();
-                        responsaveis.addAll(controller2.pesquisarTodos());
+                        marcas.clear();
+                        marcas.addAll(controller.pesquisarTodos());
                         grid.getDataProvider().refreshAll();
                     } else {
                         Notification notification = new Notification(
@@ -159,7 +173,7 @@ public class PeçasView extends Composite<VerticalLayout> {
                         notification.open();
                     }
                 } else {
-                    editor.editItem(responsavel);
+                    editor.editItem(marca);
                     nomeEditor.focus();
                 }
             });
@@ -170,18 +184,18 @@ public class PeçasView extends Composite<VerticalLayout> {
             grid.getDataProvider().refreshItem(event.getItem());
         });
 
-        grid.addComponentColumn(responsavel -> {
+        grid.addComponentColumn(marca -> {
             Button deletarButton = new Button(new Icon(VaadinIcon.TRASH));
             deletarButton.addClickListener(e -> {
-                if (controller2.excluir(responsavel)) {
+                if (controller.delete(marca)) {
                     Notification notification = new Notification(
-                            "Responsavel deletado com sucesso.", 3000);
+                            "Marca deletado com sucesso.", 3000);
                     notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
                     notification.setPosition(Notification.Position.MIDDLE);
                     notification.open();
                     
-                    responsaveis.clear();
-                    responsaveis.addAll(controller2.pesquisarTodos());
+                    marcas.clear();
+                    marcas.addAll(controller.pesquisarTodos());
                     grid.getDataProvider().refreshAll();
                 } else {
                     Notification notification = new Notification(
@@ -203,18 +217,18 @@ public class PeçasView extends Composite<VerticalLayout> {
                 notification.setPosition(Notification.Position.MIDDLE);
                 notification.open();
             } else {
-                Responsavel responsavel = new Responsavel();
-                responsavel.setNome(nomeField.getValue());
-                if (controller2.inserir(responsavel) == true) {
+                Marca marca = new Marca();
+                marca.setNome(nomeField.getValue());
+                if (controller.saveMarca(marca) == true) {
                     Notification notification = new Notification(
-                            "Responsavel salvo com sucesso.", 3000);
+                            "Marca salvo com sucesso.", 3000);
                     notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
                     notification.setPosition(Notification.Position.MIDDLE);
                     notification.open();
 
                     nomeField.clear();
-                    responsaveis.clear();
-                    responsaveis.addAll(controller2.pesquisarTodos());
+                    marcas.clear();
+                    marcas.addAll(controller.pesquisarTodos());
                     grid.getDataProvider().refreshAll();
                 } else {
                     Notification notification = new Notification(
@@ -228,8 +242,8 @@ public class PeçasView extends Composite<VerticalLayout> {
         Button cancelarButton = new Button("Fechar", event -> dialog.close());
 
         cancelarButton.getStyle()
-            .set("background-color", "#FF0000")  
-            .set("color", "#FFFFFF")  
+            .set("background-color", "#FF0000")
+            .set("color", "#FFFFFF")
             .set("border-radius", "10px")
             .set("box-shadow", "0 4px 8px rgba(0, 0, 0, 0.2)")
             .set("cursor", "pointer");
@@ -252,7 +266,7 @@ public class PeçasView extends Composite<VerticalLayout> {
         VerticalLayout dialogLayout = new VerticalLayout(formLayout, grid, buttonLayout);
         dialog.add(dialogLayout);
         dialog.open();
-    } */
+    }
 
     record SampleItem(String value, String label, Boolean disabled) {
     }

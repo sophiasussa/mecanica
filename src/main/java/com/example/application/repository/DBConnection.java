@@ -10,7 +10,7 @@ public class DBConnection {
 
     private final String url = "jdbc:mysql://localhost:3306/mecanica";
     private final String usuario = "root";
-    private final String senha = "";
+    private final String senha = "H123asd@";
 
     private DBConnection() throws SQLException {
         try {

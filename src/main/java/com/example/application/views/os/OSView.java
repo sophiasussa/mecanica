@@ -5,6 +5,7 @@ import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.combobox.MultiSelectComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
@@ -18,6 +19,10 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.theme.lumo.LumoUtility.Gap;
+
+import model.Peca;
+import model.Servicos;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,8 +35,10 @@ public class OSView extends Composite<VerticalLayout> {
         ComboBox comboBox = new ComboBox();
         ComboBox comboBox2 = new ComboBox();
         ComboBox comboBox3 = new ComboBox();
-        ComboBox comboBox4 = new ComboBox();
-        ComboBox comboBox5 = new ComboBox();
+        MultiSelectComboBox<Peca> comboBox4 = new MultiSelectComboBox<>(
+        "Pecas");
+        MultiSelectComboBox<Servicos> comboBox5 = new MultiSelectComboBox<>(
+        "Servicos");
         TextField textField = new TextField();
         TextField textField2 = new TextField();
         DatePicker datePicker = new DatePicker();
@@ -64,11 +71,11 @@ public class OSView extends Composite<VerticalLayout> {
         comboBox4.setPlaceholder("Serviços");
         comboBox4.setWidth("min-content");
         comboBox4.addClassName("rounded-text-field");
-        setComboBoxSampleData(comboBox4);
+       // setComboBoxSampleData(comboBox4);
         comboBox5.setPlaceholder("Peças");
         comboBox5.setWidth("min-content");
         comboBox5.addClassName("rounded-text-field");
-        setComboBoxSampleData(comboBox5);
+  //      setComboBoxSampleData(comboBox5);
         textField.setPlaceholder("Número da OS");
         textField.addClassName("rounded-text-field");
         textField.setWidth("min-content");
