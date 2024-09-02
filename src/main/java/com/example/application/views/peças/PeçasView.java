@@ -10,6 +10,7 @@ import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.Hr;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
@@ -26,31 +27,46 @@ import com.vaadin.flow.theme.lumo.LumoUtility.Gap;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 
 import controller.MarcaController;
+import controller.PecaController;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import model.Marca;
+import model.Peca;
+import model.Servicos;
 
 @PageTitle("Peças")
 @Route(value = "my-view3", layout = MainLayout.class)
 public class PeçasView extends Composite<VerticalLayout> {
-    MarcaController controller = new MarcaController();
 
+    MarcaController controller = new MarcaController();
+    PecaController controller2 = new PecaController();
+    private TextField textField;
+    private TextField textField2;
+    private Grid<Peca> grid;
+    private ComboBox<Marca> comboBox = new ComboBox<>("Marca");
+    private Integer pecaId;  // Armazena o ID do serviço em edição
+    private TextField textField3; // Campo de pesquisa
+    private Button buttonPrimary2; // Botão de pesquisa
+    
     public PeçasView() {
+        controller2 = new PecaController();
+
+        // Formulário
         FormLayout formLayout2Col = new FormLayout();
-        TextField textField = new TextField();
-        TextField textField2 = new TextField();
+        textField = new TextField();
+        textField2 = new TextField();
         HorizontalLayout layoutRow = new HorizontalLayout();
-        ComboBox comboBox = new ComboBox();
+        comboBox = new ComboBox();
         Button buttonTertiary = new Button();
         VerticalLayout layoutColumn2 = new VerticalLayout();
         HorizontalLayout layoutRow2 = new HorizontalLayout();
         Button buttonPrimary = new Button();
         Hr hr = new Hr();
         HorizontalLayout layoutRow3 = new HorizontalLayout();
-        TextField textField3 = new TextField();
-        Button buttonPrimary2 = new Button();
+        textField3 = new TextField();
+        buttonPrimary2 = new Button();
         Hr hr2 = new Hr();
         VerticalLayout layout = new VerticalLayout();
         getContent().setWidth("100%");
@@ -72,7 +88,7 @@ public class PeçasView extends Composite<VerticalLayout> {
         comboBox.setPlaceholder("Marca");
         comboBox.addClassName("rounded-text-field");
         comboBox.setWidth("min-content");
-        setComboBoxSampleData(comboBox);
+        setComboBoxData(comboBox);
         buttonTertiary.setText("+ Marca");
         buttonTertiary.setWidth("min-content");
         buttonTertiary.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
@@ -91,6 +107,7 @@ public class PeçasView extends Composite<VerticalLayout> {
         buttonPrimary.setText("Salvar");
         buttonPrimary.getStyle().set("border-radius", "25px");
         buttonPrimary.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        buttonPrimary.addClickListener(e -> saveOrUpdatePeca());
         layoutRow3.setWidthFull();
         layoutColumn2.setFlexGrow(1.0, layoutRow3);
         layoutRow3.addClassName(Gap.MEDIUM);
@@ -105,6 +122,7 @@ public class PeçasView extends Composite<VerticalLayout> {
         buttonPrimary2.getStyle().set("border-radius", "50%");
         buttonPrimary2.setWidth("min-content");
         buttonPrimary2.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        buttonPrimary2.addClickListener(e -> searchPeca());
         hr.getStyle().set("box-shadow", "0 1px 4px rgba(0, 0, 0, 0.2)");
         hr2.getStyle().set("box-shadow", "0 -1px 4px rgba(0, 0, 0, 0.1)");
         formLayout2Col.add(textField);
@@ -121,6 +139,9 @@ public class PeçasView extends Composite<VerticalLayout> {
         layoutRow3.add(textField3);
         layoutRow3.add(buttonPrimary2);
         layoutColumn2.add(hr2);
+
+        grid = createGrid();
+        getContent().add(grid);
 
     }
 
@@ -268,16 +289,123 @@ public class PeçasView extends Composite<VerticalLayout> {
         dialog.open();
     }
 
-    record SampleItem(String value, String label, Boolean disabled) {
+    private Grid<Peca> createGrid() {
+        grid = new Grid<>(Peca.class, false);
+        grid.addColumn(Peca::getDescricao).setHeader("Descrição").setSortable(true);
+        grid.addColumn(Peca::getPreco).setHeader("Valor").setSortable(true);
+        grid.addColumn(peca -> peca.getMarca().getId()).setHeader("Marca").setSortable(true);
+
+        grid.addComponentColumn(peca -> {
+            Button deleteButton = new Button(VaadinIcon.TRASH.create(), e -> deletePeca(peca));
+            deleteButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
+            return deleteButton;
+        }).setHeader("Ações");
+
+        grid.addItemDoubleClickListener(e -> editPeca(e.getItem()));
+
+        grid.setItems(controller2.getAll());
+        grid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
+
+        return grid;
     }
 
-    private void setComboBoxSampleData(ComboBox comboBox) {
-        List<SampleItem> sampleItems = new ArrayList<>();
-        sampleItems.add(new SampleItem("first", "First", null));
-        sampleItems.add(new SampleItem("second", "Second", null));
-        sampleItems.add(new SampleItem("third", "Third", Boolean.TRUE));
-        sampleItems.add(new SampleItem("fourth", "Fourth", null));
-        comboBox.setItems(sampleItems);
-        comboBox.setItemLabelGenerator(item -> ((SampleItem) item).label());
+    private void saveOrUpdatePeca() {
+        String descricao = textField.getValue();
+        double preco;
+        Marca marcaSelecionada = comboBox.getValue();
+
+        if (marcaSelecionada == null) {
+            Notification.show("Você deve selecionar uma marca.");
+            return;
+        }
+
+        int idMarca = marcaSelecionada.getId();
+
+        try {
+            preco = Double.parseDouble(textField2.getValue());
+        } catch (NumberFormatException e) {
+            Notification.show("Valor inválido.");
+            return;
+        }
+
+        if (descricao == null || descricao.isEmpty()) {
+            Notification.show("Descrição não pode estar vazia.");
+            return;
+        }
+
+        Peca peca = new Peca();
+        peca.setDescricao(descricao);
+        peca.setPreco(preco);
+        peca.setMarca(marcaSelecionada);
+
+        boolean success;
+        if (pecaId != null && pecaId > 0) {
+            peca.setId(pecaId);
+            success = controller2.update(peca);
+            if (success) {
+                Notification.show("Peça atualizada com sucesso!");
+            } else {
+                Notification.show("Falha ao atualizar o peça.");
+            }
+        } else {
+            success = controller2.savePeca(peca);
+            if (success) {
+                Notification.show("Peça salva com sucesso!");
+            } else {
+                Notification.show("Falha ao salvar a peça.");
+            }
+        }
+
+        if (success) {
+            clearForm();
+            refreshGrid();
+        }
+    }
+
+    private void deletePeca(Peca peca) {
+        boolean success = controller2.delete(peca);
+        if (success) {
+            refreshGrid();
+        } else {
+            System.out.println("Erro ao excluir peca.");
+        }
+    }
+
+    private void editPeca(Peca peca) {
+        pecaId = peca.getId(); // Armazena o ID do serviço em edição
+        textField.setValue(peca.getDescricao());
+        textField2.setValue(String.valueOf(peca.getPreco()));
+        comboBox.setValue(peca.getMarca());
+    }
+
+    private void refreshGrid() {
+        List<Peca> pecas = controller2.getAll();
+        grid.setItems(pecas);
+    }
+
+    private void clearForm() {
+        pecaId = null; // Reseta o ID do serviço em edição
+        textField.clear();
+        textField2.clear();
+        comboBox.clear();
+    }
+
+    private void setComboBoxData(ComboBox<Marca> comboBox) {
+        List<Marca> marcas = controller.pesquisarTodos();
+        comboBox.setItems(marcas);
+        comboBox.setItemLabelGenerator(marca -> marca.getNome());
+    }
+
+    private void searchPeca() {
+        String searchTerm = textField3.getValue();
+        List<Peca> pecas;
+
+        if (searchTerm == null || searchTerm.isEmpty()) {
+            pecas = controller2.getAll();
+        } else {
+            pecas = controller2.search(searchTerm);
+        }
+
+        grid.setItems(pecas);
     }
 }

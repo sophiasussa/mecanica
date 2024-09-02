@@ -20,7 +20,7 @@ public class ServicosRepository {
     
 
         public boolean saveServicos(Servicos servico) {
-            String sql = "INSERT INTO Servicos (descricaoServico, preco) VALUES (?, ?)";
+            String sql = "INSERT INTO servicos (descricao_servico, preco) VALUES (?, ?)";
             try (PreparedStatement stmt = connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
                 // Não define o ID, pois é auto-incremento
                 stmt.setString(1, servico.getDescricaoServico());
@@ -46,7 +46,7 @@ public class ServicosRepository {
 
         public List<String> getAllServicos() {
             List<String> servicos = new ArrayList<>();
-            String sql = "SELECT descricaoServico FROM Servicos";
+            String sql = "SELECT descricao_servico FROM servicos";
             try (PreparedStatement stmt = connection.prepareStatement(sql)) {
                 ResultSet result = stmt.executeQuery();
                 while (result.next()) {
@@ -61,13 +61,13 @@ public class ServicosRepository {
 
     public List<Servicos> getAll() {
         List<Servicos> servicos = new ArrayList<>();
-        String sql = "SELECT * FROM Servicos";
+        String sql = "SELECT * FROM servicos";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             ResultSet result = stmt.executeQuery();
             while (result.next()) {
                 Servicos servico = new Servicos();
                 servico.setId(result.getInt("id"));
-                servico.setDescricaoServico(result.getString("descricaoServico"));
+                servico.setDescricaoServico(result.getString("descricao_servico"));
                 servico.setPreco(result.getDouble("preco"));
                 servicos.add(servico);
             }
@@ -78,7 +78,7 @@ public class ServicosRepository {
     }
 
     public boolean update(Servicos servico) {
-        String sql = "UPDATE Servicos SET descricaoServico = ?, preco = ? WHERE id = ?";
+        String sql = "UPDATE servicos SET descricao_servico = ?, preco = ? WHERE id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, servico.getDescricaoServico());
             stmt.setDouble(2, servico.getPreco());
@@ -93,7 +93,7 @@ public class ServicosRepository {
     
 
     public boolean delete(Servicos servico) {
-        String sql = "DELETE FROM Servicos WHERE id = ?";
+        String sql = "DELETE FROM servicos WHERE id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, servico.getId());
             int rowsDeleted = stmt.executeUpdate();
@@ -106,7 +106,7 @@ public class ServicosRepository {
 
     public List<Servicos> searchServicos(String searchTerm) {
         List<Servicos> servicos = new ArrayList<>();
-        String sql = "SELECT * FROM Servicos WHERE descricaoServico LIKE ?";
+        String sql = "SELECT * FROM servicos WHERE descricao_servico LIKE ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, "%" + searchTerm + "%"); // Pesquisa com LIKE
             ResultSet result = stmt.executeQuery();

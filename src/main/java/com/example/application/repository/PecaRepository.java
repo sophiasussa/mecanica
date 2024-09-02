@@ -70,7 +70,7 @@ public class PecaRepository {
                 peca.setId(result.getInt("id"));
                 peca.setDescricao(result.getString("descricao"));
                 peca.setPreco(result.getDouble("preco"));
-                Marca marca = new MarcaRepository().pesquisar(result.getInt("idMarca"));
+                Marca marca = new MarcaRepository().pesquisar(result.getInt("id_marca"));
                 peca.setMarca(marca);
                 pecas.add(peca);
             }
@@ -96,7 +96,7 @@ public class PecaRepository {
     }
     
 
-    public boolean delete(Peca peca) {
+    public boolean deletePeca(Peca peca) {
         String sql = "DELETE FROM pecas WHERE id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, peca.getId());

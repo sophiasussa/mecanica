@@ -47,7 +47,7 @@ public class PecaController {
 
     public boolean delete(Peca peca) {
         try {
-            return pecaRepository.delete(peca);
+            return pecaRepository.deletePeca(peca);
         } catch (Exception e) {
             e.printStackTrace();
             return false;
