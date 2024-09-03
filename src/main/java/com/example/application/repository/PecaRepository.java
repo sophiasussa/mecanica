@@ -119,6 +119,7 @@ public class PecaRepository {
                 peca.setId(result.getInt("id"));
                 peca.setDescricao(result.getString("descricao"));
                 peca.setPreco(result.getDouble("preco"));
+                peca.setMarca(new MarcaRepository().getMarcaById(result.getInt("id_marca")));
                 pecas.add(peca);
             }
         } catch (SQLException e) {

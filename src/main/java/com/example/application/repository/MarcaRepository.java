@@ -107,7 +107,7 @@ public class MarcaRepository {
     }
 
     public Marca getMarcaById(int id) {
-        String sql = "SELECT * FROM Marca WHERE id = ?";
+        String sql = "SELECT * FROM marca WHERE id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, id);
             ResultSet result = stmt.executeQuery();

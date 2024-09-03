@@ -75,6 +75,7 @@ public class OSView extends Composite<VerticalLayout> {
         "Servicos");
     private TextField textField;
     private TextField textField2;
+
     private DatePicker datePicker;
     private DatePicker datePicker2;
     private Grid<OrdemServico> grid;
@@ -97,7 +98,7 @@ public class OSView extends Composite<VerticalLayout> {
         Button buttonPrimary = new Button();
         Hr hr = new Hr();
         HorizontalLayout layoutRow = new HorizontalLayout();
-        TextField textField3 = new TextField();
+        textField3 = new TextField();
         Button buttonPrimary2 = new Button();
         Hr hr2 = new Hr();
         VerticalLayout layout = new VerticalLayout();
