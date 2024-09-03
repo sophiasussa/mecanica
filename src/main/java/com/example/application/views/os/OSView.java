@@ -9,6 +9,7 @@ import com.vaadin.flow.component.combobox.MultiSelectComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
+import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Hr;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
@@ -20,8 +21,18 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.theme.lumo.LumoUtility.Gap;
 
+import controller.ClienteController;
+import controller.MecanicoController;
+import controller.PecaController;
+import controller.ServicosController;
+import controller.VeiculosController;
 import model.Peca;
 import model.Servicos;
+import model.Veiculo;
+import model.Cliente;
+import model.Marca;
+import model.Mecanico;
+import model.OrdemServico;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,19 +41,36 @@ import java.util.List;
 @Route(value = "my-view5", layout = MainLayout.class)
 public class OSView extends Composite<VerticalLayout> {
 
+    ClienteController clienteController = new ClienteController();
+    MecanicoController mecanicoController = new MecanicoController();
+    VeiculosController veiculosController = new VeiculosController();
+    PecaController pecaController = new PecaController();
+    ServicosController servicosController = new ServicosController();
+
+    private ComboBox<Cliente> comboBox = new ComboBox<>("Cliente");
+    private ComboBox<Mecanico> comboBox2 = new ComboBox<>("Mecanico");
+    private ComboBox<Veiculo> comboBox3 = new ComboBox<>("Veiculo");
+    private MultiSelectComboBox<Peca> comboBox4 = new MultiSelectComboBox<>(
+        "Pecas");
+    private MultiSelectComboBox<Servicos> comboBox5 = new MultiSelectComboBox<>(
+        "Servicos");
+    private TextField textField;
+    private TextField textField2;
+    private DatePicker datePicker;
+    private DatePicker datePicker2;
+    private Grid<OrdemServico> grid;
+
     public OSView() {
         FormLayout formLayout3Col = new FormLayout();
-        ComboBox comboBox = new ComboBox();
-        ComboBox comboBox2 = new ComboBox();
-        ComboBox comboBox3 = new ComboBox();
-        MultiSelectComboBox<Peca> comboBox4 = new MultiSelectComboBox<>(
-        "Pecas");
-        MultiSelectComboBox<Servicos> comboBox5 = new MultiSelectComboBox<>(
-        "Servicos");
-        TextField textField = new TextField();
-        TextField textField2 = new TextField();
-        DatePicker datePicker = new DatePicker();
-        DatePicker datePicker2 = new DatePicker();
+        comboBox = new ComboBox();
+        comboBox2 = new ComboBox();
+        comboBox3 = new ComboBox();
+        comboBox4 = new MultiSelectComboBox();
+        comboBox5 = new MultiSelectComboBox();
+        textField = new TextField();
+        textField2 = new TextField();
+        datePicker = new DatePicker();
+        datePicker2 = new DatePicker();
         VerticalLayout layoutColumn2 = new VerticalLayout();
         Button buttonPrimary = new Button();
         Hr hr = new Hr();
@@ -59,23 +87,23 @@ public class OSView extends Composite<VerticalLayout> {
         comboBox.setPlaceholder("Cliente");
         comboBox.setWidth("min-content");
         comboBox.addClassName("rounded-text-field");
-        setComboBoxSampleData(comboBox);
-        comboBox2.setPlaceholder("Veículo");
+        setComboBoxClienteData(comboBox);
+        comboBox2.setPlaceholder("Mecanico");
         comboBox2.setWidth("min-content");
         comboBox2.addClassName("rounded-text-field");
-        setComboBoxSampleData(comboBox2);
-        comboBox3.setPlaceholder("Mecânico");
+        setComboBoxMecanicoData(comboBox2);
+        comboBox3.setPlaceholder("Veiculo");
         comboBox3.setWidth("min-content");
         comboBox3.addClassName("rounded-text-field");
-        setComboBoxSampleData(comboBox3);
-        comboBox4.setPlaceholder("Serviços");
+        setComboBoxVeiculoData(comboBox3);
+        comboBox4.setPlaceholder("Peças");
         comboBox4.setWidth("min-content");
         comboBox4.addClassName("rounded-text-field");
-       // setComboBoxSampleData(comboBox4);
-        comboBox5.setPlaceholder("Peças");
+        setComboBoxPecaData(comboBox4);
+        comboBox5.setPlaceholder("Serviços");
         comboBox5.setWidth("min-content");
         comboBox5.addClassName("rounded-text-field");
-  //      setComboBoxSampleData(comboBox5);
+        setComboBoxServicoData(comboBox5);
         textField.setPlaceholder("Número da OS");
         textField.addClassName("rounded-text-field");
         textField.setWidth("min-content");
@@ -132,18 +160,38 @@ public class OSView extends Composite<VerticalLayout> {
         layoutRow.add(textField3);
         layoutRow.add(buttonPrimary2);
         layoutColumn2.add(hr2);
+
+  //      grid = createGrid();
+    //    getContent().add(grid);
     }
 
-    record SampleItem(String value, String label, Boolean disabled) {
+    private void setComboBoxClienteData(ComboBox<Cliente> comboBox) {
+        List<Cliente> clientes = clienteController.getAllClientes();
+        comboBox.setItems(clientes);
+        comboBox.setItemLabelGenerator(cliente -> cliente.getNome());
     }
 
-    private void setComboBoxSampleData(ComboBox comboBox) {
-        List<SampleItem> sampleItems = new ArrayList<>();
-        sampleItems.add(new SampleItem("first", "First", null));
-        sampleItems.add(new SampleItem("second", "Second", null));
-        sampleItems.add(new SampleItem("third", "Third", Boolean.TRUE));
-        sampleItems.add(new SampleItem("fourth", "Fourth", null));
-        comboBox.setItems(sampleItems);
-        comboBox.setItemLabelGenerator(item -> ((SampleItem) item).label());
+    private void setComboBoxMecanicoData(ComboBox<Mecanico> comboBox2) {
+        List<Mecanico> mecanicos = mecanicoController.getAllMecanicos();
+        comboBox2.setItems(mecanicos);
+        comboBox2.setItemLabelGenerator(mecanico -> mecanico.getNome());
+    }
+
+    private void setComboBoxVeiculoData(ComboBox<Veiculo> comboBox3) {
+        List<Veiculo> veiculos = veiculosController.getAllVeiculos();
+        comboBox3.setItems(veiculos);
+        comboBox3.setItemLabelGenerator(veiculo -> veiculo.getDescricaoVeiculo());
+    }
+
+    private void setComboBoxPecaData(MultiSelectComboBox<Peca> comboBox4) {
+        List<Peca> pecas = pecaController.getAll();
+        comboBox4.setItems(pecas);
+        comboBox4.setItemLabelGenerator(peca -> peca.getDescricao());
+    }
+
+    private void setComboBoxServicoData(MultiSelectComboBox<Servicos> comboBox5) {
+        List<Servicos> servicos = servicosController.getAllServicos();
+        comboBox5.setItems(servicos);
+        comboBox5.setItemLabelGenerator(servico -> servico.getDescricaoServico());
     }
 }
