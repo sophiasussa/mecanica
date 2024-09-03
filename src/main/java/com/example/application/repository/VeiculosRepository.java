@@ -117,5 +117,28 @@ public class VeiculosRepository {
         return veiculos;
     }
 
+    public Veiculo getVeiculoById(int id) {
+        String sql = "SELECT * FROM Veiculo WHERE id = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, id);
+            ResultSet result = stmt.executeQuery();
+            if (result.next()) {
+                Veiculo veiculo = new Veiculo();
+                veiculo.setId(result.getInt("id"));
+                veiculo.setDescricaoVeiculo(result.getString("descricao_veiculo"));
+                veiculo.setPlaca(result.getString("placa"));
+                veiculo.setAnoModelo(result.getString("ano_modelo"));
+                veiculo.setIdCliente(result.getInt("id_cliente"));
+                veiculo.setImagem(result.getString("imagem"));
+                return veiculo;
+            } else {
+                return null;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+    
     
 }

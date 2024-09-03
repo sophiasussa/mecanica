@@ -176,11 +176,11 @@ public class MecanicoRepository {
                 mecanico.setTelefone(result.getString("telefone"));
                 return mecanico;
             } else {
-                return null; // Mecanico não encontrado
+                return null;
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            return null; // Em caso de erro
+            return null;
         }
     }
 

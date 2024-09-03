@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.example.application.repository.PecaRepository;
 
+import model.Marca;
 import model.Peca;
 
 public class PecaController {
@@ -51,6 +52,16 @@ public class PecaController {
         } catch (Exception e) {
             e.printStackTrace();
             return false;
+        }
+    }
+
+    public Peca getPecaById(Peca peca) {
+        try {
+            int idPeca = peca.getId();
+            return pecaRepository.getPecaById(idPeca);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
         }
     }
 

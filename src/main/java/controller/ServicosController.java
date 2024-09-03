@@ -3,6 +3,7 @@ package controller;
 
 import com.example.application.repository.ServicosRepository;
 
+import model.Peca;
 import model.Servicos;
 import java.util.List;
 
@@ -57,5 +58,15 @@ public class ServicosController {
 
     public List<Servicos> searchServicos(String searchTerm) {
         return servicosRepository.searchServicos(searchTerm);
+    }
+
+    public Servicos getServicoById(Servicos servico) {
+        try {
+            int idServico = servico.getId();
+            return servicosRepository.getServicoById(idServico);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }

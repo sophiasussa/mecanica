@@ -127,4 +127,26 @@ public class PecaRepository {
         return pecas;
     }
 
+    public Peca getPecaById(int id) {
+        String sql = "SELECT * FROM Peca WHERE id = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, id);
+            ResultSet result = stmt.executeQuery();
+            if (result.next()) {
+                Peca peca = new Peca();
+                peca.setId(result.getInt("id"));
+                peca.setDescricao(result.getString("descricao"));
+                peca.setPreco(result.getDouble("preco"));
+                peca.setMarca(new MarcaRepository().getMarcaById(result.getInt("id_marca")));
+    
+                return peca;
+            } else {
+                return null;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
 }

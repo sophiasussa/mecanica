@@ -30,6 +30,16 @@ public class MarcaController {
         }
     }
 
+    public Marca getMarcaById(Marca marca) {
+        try {
+            int idMarca = marca.getId();
+            return marcaRepository.getMarcaById(idMarca);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     public boolean update(Marca marca) {
         try {
             return marcaRepository.update(marca);

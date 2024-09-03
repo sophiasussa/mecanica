@@ -105,4 +105,24 @@ public class MarcaRepository {
             return null;
         }
     }
+
+    public Marca getMarcaById(int id) {
+        String sql = "SELECT * FROM Marca WHERE id = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, id);
+            ResultSet result = stmt.executeQuery();
+            if (result.next()) {
+                Marca marca = new Marca();
+                marca.setId(result.getInt("id"));
+                marca.setNome(result.getString("nome"));
+                return marca;
+            } else {
+                return null;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+    
 }

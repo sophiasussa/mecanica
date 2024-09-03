@@ -71,4 +71,13 @@ private final ClienteRepository clienteRepository;
             return null;
         }
     }
+
+    public Veiculo getVeiculoById(int id) {
+        try {
+            return veiculosRepository.getVeiculoById(id);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 }

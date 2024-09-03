@@ -1,5 +1,6 @@
 package com.example.application.repository;
 
+import model.Peca;
 import model.Servicos;
 
 import java.sql.Connection;
@@ -121,6 +122,27 @@ public class ServicosRepository {
             e.printStackTrace();
         }
         return servicos;
+    }
+
+    public Servicos getServicoById(int id) {
+        String sql = "SELECT * FROM servicos WHERE id = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, id);
+            ResultSet result = stmt.executeQuery();
+            if (result.next()) {
+                Servicos servico = new Servicos();
+                servico.setId(result.getInt("id"));
+                servico.setDescricaoServico(result.getString("descricaoServico"));
+                servico.setPreco(result.getDouble("preco"));
+    
+                return servico;
+            } else {
+                return null;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
         
 }
