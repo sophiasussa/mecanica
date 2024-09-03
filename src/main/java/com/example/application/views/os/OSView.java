@@ -1,5 +1,6 @@
 package com.example.application.views.os;
 
+import com.example.application.repository.PecaRepository;
 import com.example.application.views.MainLayout;
 import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.button.Button;
@@ -7,11 +8,15 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.combobox.MultiSelectComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
+import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.Hr;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.JustifyContentMode;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -23,17 +28,28 @@ import com.vaadin.flow.theme.lumo.LumoUtility.Gap;
 
 import controller.ClienteController;
 import controller.MecanicoController;
+import controller.OSController;
+import controller.OSPecaController;
+import controller.OSServicoController;
 import controller.PecaController;
 import controller.ServicosController;
 import controller.VeiculosController;
 import model.Peca;
 import model.Servicos;
 import model.Veiculo;
+import oshi.software.os.OSService;
 import model.Cliente;
 import model.Marca;
 import model.Mecanico;
+import model.OSPeca;
+import model.OSServico;
 import model.OrdemServico;
 
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.HashSet;
+
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,6 +62,9 @@ public class OSView extends Composite<VerticalLayout> {
     VeiculosController veiculosController = new VeiculosController();
     PecaController pecaController = new PecaController();
     ServicosController servicosController = new ServicosController();
+    OSController osController = new OSController();
+    OSPecaController osPecaController = new OSPecaController();
+    OSServicoController osServicoController = new OSServicoController();
 
     private ComboBox<Cliente> comboBox = new ComboBox<>("Cliente");
     private ComboBox<Mecanico> comboBox2 = new ComboBox<>("Mecanico");
@@ -59,6 +78,9 @@ public class OSView extends Composite<VerticalLayout> {
     private DatePicker datePicker;
     private DatePicker datePicker2;
     private Grid<OrdemServico> grid;
+    private Integer osId;
+    private TextField textField3;
+    private Button buttonPrimary2;
 
     public OSView() {
         FormLayout formLayout3Col = new FormLayout();
@@ -126,6 +148,7 @@ public class OSView extends Composite<VerticalLayout> {
         buttonPrimary.getStyle().set("border-radius", "25px");
         buttonPrimary.setWidth("min-content");
         buttonPrimary.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        buttonPrimary.addClickListener(e -> saveOrUpdateOS());
         layoutRow.setWidthFull();
         layoutColumn2.setFlexGrow(1.0, layoutRow);
         layoutRow.addClassName(Gap.MEDIUM);
@@ -141,6 +164,7 @@ public class OSView extends Composite<VerticalLayout> {
         buttonPrimary2.setIcon(VaadinIcon.SEARCH.create());
         buttonPrimary2.getStyle().set("border-radius", "50%");
         buttonPrimary2.setWidth("min-content");
+        buttonPrimary2.addClickListener(e -> searchOS());
         buttonPrimary2.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         formLayout3Col.add(comboBox);
         formLayout3Col.add(comboBox2);
@@ -161,8 +185,8 @@ public class OSView extends Composite<VerticalLayout> {
         layoutRow.add(buttonPrimary2);
         layoutColumn2.add(hr2);
 
-  //      grid = createGrid();
-    //    getContent().add(grid);
+        grid = createGrid();
+        getContent().add(grid);
     }
 
     private void setComboBoxClienteData(ComboBox<Cliente> comboBox) {
@@ -193,5 +217,208 @@ public class OSView extends Composite<VerticalLayout> {
         List<Servicos> servicos = servicosController.getAllServicos();
         comboBox5.setItems(servicos);
         comboBox5.setItemLabelGenerator(servico -> servico.getDescricaoServico());
+    }
+
+    private Grid<OrdemServico> createGrid() {
+        grid = new Grid<>(OrdemServico.class, false);
+        grid.addColumn(OrdemServico::getNumeroOS).setHeader("NumeroOS").setSortable(true);
+        grid.addColumn(OrdemServico::getDataAbertura).setHeader("Abertura").setSortable(true);
+        grid.addColumn(OrdemServico::getDataEncerramento).setHeader("Encerramento").setSortable(true);
+        grid.addColumn(OrdemServico::getValorTotal).setHeader("Valor").setSortable(true);
+        grid.addColumn(os -> os.getCliente().getNome()).setHeader("Cliente").setSortable(true);
+        grid.addColumn(os -> os.getMecanico().getNome()).setHeader("Mecanico").setSortable(true);
+        grid.addColumn(os -> os.getVeiculo().getDescricaoVeiculo()).setHeader("Veiculo").setSortable(true);
+
+        grid.addComponentColumn(os -> {
+            Button pecasButton = new Button(VaadinIcon.COGS.create());
+            pecasButton.getStyle().set("border-radius", "50%");
+            pecasButton.getStyle().set("background-color", "#9E9E9E");
+            pecasButton.getStyle().set("color", "#FFFFFF");
+            pecasButton.getStyle().set("cursor", "pointer");
+            pecasButton.addClickListener(event -> {
+                Dialog dialog = new Dialog();
+                dialog.setHeaderTitle("Peças da OS");
+                
+                VerticalLayout layout = new VerticalLayout();
+                layout.setSpacing(false);
+                layout.setPadding(false);
+        
+                List<OSPeca> osPecasList = osPecaController.getOsPecasByOrdemServicoId(os);
+
+                osPecasList.forEach(osp -> {
+                    Span pecaSpan = new Span(osp.getPeca().getDescricao() + ", " + osp.getPeca().getPreco() + " - " + osp.getPeca().getMarca().getNome());
+                    pecaSpan.getStyle().set("padding", "8px 0");
+                    layout.add(pecaSpan);
+                });
+                
+                dialog.add(layout);
+                
+                Button closeButton = new Button("Fechar", eventClose -> dialog.close());
+                closeButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+                dialog.getFooter().add(closeButton);
+                
+                dialog.open();
+            });
+            
+            return pecasButton;
+        }).setHeader("Peças");
+
+        grid.addComponentColumn(os -> {
+            Button servicoButton = new Button(VaadinIcon.PASTE.create());
+            servicoButton.getStyle().set("border-radius", "50%");
+            servicoButton.getStyle().set("background-color", "#9E9E9E");
+            servicoButton.getStyle().set("color", "#FFFFFF");
+            servicoButton.getStyle().set("cursor", "pointer");
+            servicoButton.addClickListener(event -> {
+                Dialog dialog = new Dialog();
+                dialog.setHeaderTitle("Serviços da OS");
+                
+                VerticalLayout layout = new VerticalLayout();
+                layout.setSpacing(false);
+                layout.setPadding(false);
+        
+                List<OSServico> osServicoList = osServicoController.getOsServicoByOrdemServicoId(os);
+        
+                osServicoList.forEach(osp -> {
+                    Span servSpan = new Span(osp.getServico().getDescricaoServico() + " - " + osp.getServico().getPreco());
+                    servSpan.getStyle().set("padding", "8px 0");
+                    layout.add(servSpan);
+                });
+                
+                dialog.add(layout);
+                
+                Button closeButton = new Button("Fechar", eventClose -> dialog.close());
+                closeButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+                dialog.getFooter().add(closeButton);
+                
+                dialog.open();
+            });
+            
+            return servicoButton;
+        }).setHeader("Serviços");
+
+        grid.addComponentColumn(os -> {
+            Button deleteButton = new Button(VaadinIcon.TRASH.create(), e -> deleteOS(os));
+            deleteButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
+            return deleteButton;
+        }).setHeader("Ações");
+
+        grid.addItemDoubleClickListener(e -> editOS(e.getItem()));
+
+        grid.setItems(osController.getAllOrdensServico());
+        grid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
+
+        return grid;
+    }
+
+    private void saveOrUpdateOS() {
+        int numeroOS = Integer.parseInt(textField.getValue());
+        double valorTotal = Double.parseDouble(textField2.getValue());
+        LocalDate data = datePicker.getValue();
+        LocalDate data2 = datePicker2.getValue();
+        Cliente clienteSelecionado = comboBox.getValue();
+        Mecanico mecanicoSelecionado = comboBox2.getValue();
+        Veiculo veiculoSelecionado = comboBox3.getValue();
+        List<Peca> osPecasList = new ArrayList<>(comboBox4.getValue());
+        List<Servicos> osServicoList = new ArrayList<>(comboBox5.getValue());
+
+        OrdemServico os = new OrdemServico();
+        os.setNumeroOS(numeroOS);
+        os.setValorTotal(valorTotal);
+        os.setDataAbertura(data);
+        os.setDataEncerramento(data2);
+        os.setCliente(clienteSelecionado);
+        os.setMecanico(mecanicoSelecionado);
+        os.setVeiculo(veiculoSelecionado);
+
+        boolean success;
+        if (osId != null && osId > 0) {
+            os.setId(osId);
+            success = osController.updateOrdemServico(os, osPecasList, osServicoList);
+            if (success) {
+                Notification.show("OS atualizada com sucesso!");
+            } else {
+                Notification.show("Falha ao atualizar o OS.");
+            }
+        } else {
+            success = osController.saveOrdemServico(os, osPecasList, osServicoList);
+            if (success) {
+                Notification.show("OS salva com sucesso!");
+            } else {
+                Notification.show("Falha ao salvar a OS.");
+            }
+        }
+
+        if (success) {
+            clearForm();
+            refreshGrid();
+        }
+    }
+
+    private void deleteOS(OrdemServico os) {
+        boolean success = osController.deleteOrdemServico(os);
+        if (success) {
+            refreshGrid();
+        } else {
+            System.out.println("Erro ao excluir OS.");
+        }
+    }
+
+    private void refreshGrid() {
+        List<OrdemServico> oss = osController.getAllOrdensServico();
+        grid.setItems(oss);
+    }
+
+    private void clearForm() {
+        osId = null;
+        textField.clear();
+        textField2.clear();
+        datePicker.clear();
+        datePicker2.clear();
+        comboBox.clear();
+        comboBox2.clear();
+        comboBox3.clear();
+        comboBox4.clear();
+        comboBox5.clear();
+    }
+
+    private void editOS(OrdemServico os) {
+        osId = os.getId(); // Armazena o ID do serviço em edição
+        textField.setValue(String.valueOf(os.getNumeroOS()));
+        textField2.setValue(String.valueOf(os.getValorTotal()));
+        datePicker.setValue(os.getDataAbertura());
+        datePicker2.setValue(os.getDataEncerramento());
+        comboBox.setValue(os.getCliente());
+        comboBox2.setValue(os.getMecanico());
+        comboBox3.setValue(os.getVeiculo());
+        List<OSServico> osServicoList = osServicoController.getOsServicoByOrdemServicoId(os);
+        List<OSPeca> osPecasList = osPecaController.getOsPecasByOrdemServicoId(os);
+
+        // Mapeando OSServico para Servicos
+        Set<Servicos> servicosSelecionados = osServicoList.stream()
+            .map(OSServico::getServico)  // Método para obter o objeto Servicos de OSServico
+            .collect(Collectors.toSet());
+
+        // Mapeando OSPeca para Peca
+        Set<Peca> pecasSelecionadas = osPecasList.stream()
+            .map(OSPeca::getPeca)  // Método para obter o objeto Peca de OSPeca
+            .collect(Collectors.toSet());
+
+        // Configurando os valores no MultiSelectComboBox
+        comboBox4.setValue(pecasSelecionadas);
+        comboBox5.setValue(servicosSelecionados);
+    }
+
+    private void searchOS() {
+        String searchTerm = textField3.getValue();
+        List<OrdemServico> oss;
+
+        if (searchTerm == null || searchTerm.isEmpty()) {
+            oss = osController.getAllOrdensServico();
+        } else {
+            oss = osController.searchOS(searchTerm);
+        }
+
+        grid.setItems(oss);
     }
 }

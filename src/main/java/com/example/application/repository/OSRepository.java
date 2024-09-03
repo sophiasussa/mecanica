@@ -31,8 +31,8 @@ public class OSRepository {
 
     try (PreparedStatement stmtOS = connection.prepareStatement(sqlOS, PreparedStatement.RETURN_GENERATED_KEYS)) {
         stmtOS.setInt(1, os.getNumeroOS());
-        stmtOS.setDate(2, new java.sql.Date(os.getDataAbertura().getTime()));
-        stmtOS.setDate(3, new java.sql.Date(os.getDataEncerramento().getTime()));
+        stmtOS.setDate(2, java.sql.Date.valueOf(os.getDataAbertura()));
+        stmtOS.setDate(3, java.sql.Date.valueOf(os.getDataEncerramento()));        
         stmtOS.setDouble(4, os.getValorTotal());
         stmtOS.setInt(5, os.getCliente().getId());
         stmtOS.setInt(6, os.getMecanico().getId());
@@ -91,8 +91,8 @@ public class OSRepository {
                 OrdemServico os = new OrdemServico();
                 os.setId(rsOS.getInt("id"));
                 os.setNumeroOS(rsOS.getInt("numero_os"));
-                os.setDataAbertura(rsOS.getDate("data_abertura_os"));
-                os.setDataEncerramento(rsOS.getDate("data_encerramento_os"));
+                os.setDataAbertura(rsOS.getDate("data_abertura_os").toLocalDate());
+                os.setDataEncerramento(rsOS.getDate("data_encerramento_os").toLocalDate());
                 os.setValorTotal(rsOS.getDouble("valor_total"));
                 os.setCliente(new ClienteRepository().getClienteById(rsOS.getInt("id_cliente")));
                 os.setMecanico(new MecanicoRepository().getMecanicoById(rsOS.getInt("id_mecanico")));
@@ -117,8 +117,8 @@ public class OSRepository {
         
         try (PreparedStatement stmtOS = connection.prepareStatement(sqlOS)) {
             stmtOS.setInt(1, os.getNumeroOS());
-            stmtOS.setDate(2, new java.sql.Date(os.getDataAbertura().getTime()));
-            stmtOS.setDate(3, new java.sql.Date(os.getDataEncerramento().getTime()));
+            stmtOS.setDate(2, java.sql.Date.valueOf(os.getDataAbertura()));
+            stmtOS.setDate(3, java.sql.Date.valueOf(os.getDataEncerramento()));
             stmtOS.setDouble(4, os.getValorTotal());
             stmtOS.setInt(5, os.getCliente().getId());
             stmtOS.setInt(6, os.getMecanico().getId());
@@ -209,8 +209,8 @@ public class OSRepository {
                 OrdemServico os = new OrdemServico();
                 os.setId(rsOS.getInt("id"));
                 os.setNumeroOS(rsOS.getInt("numero_os"));
-                os.setDataAbertura(rsOS.getDate("data_abertura_os"));
-                os.setDataEncerramento(rsOS.getDate("data_encerramento_os"));
+                os.setDataAbertura(rsOS.getDate("os.data_abertura_os").toLocalDate());
+                os.setDataEncerramento(rsOS.getDate("os.data_encerramento_os").toLocalDate());
                 os.setValorTotal(rsOS.getDouble("valor_total"));
                 os.setCliente(new ClienteRepository().getClienteById(rsOS.getInt("id_cliente")));
                 os.setMecanico(new MecanicoRepository().getMecanicoById(rsOS.getInt("id_mecanico")));
@@ -241,8 +241,8 @@ public class OSRepository {
                 OrdemServico ordemServico = new OrdemServico();
                 ordemServico.setId(result.getInt("os.id"));
                 ordemServico.setNumeroOS(result.getInt("os.numero_os"));
-                ordemServico.setDataAbertura(result.getDate("os.data_abertura_os"));
-                ordemServico.setDataEncerramento(result.getDate("os.data_encerramento_os"));
+                ordemServico.setDataAbertura(result.getDate("os.data_abertura_os").toLocalDate());
+                ordemServico.setDataEncerramento(result.getDate("os.data_encerramento_os").toLocalDate());
                 ordemServico.setValorTotal(result.getDouble("os.valor_total"));
                 ordemServico.setCliente(new ClienteRepository().getClienteById(result.getInt("id_cliente")));
                 ordemServico.setMecanico(new MecanicoRepository().getMecanicoById(result.getInt("id_mecanico")));

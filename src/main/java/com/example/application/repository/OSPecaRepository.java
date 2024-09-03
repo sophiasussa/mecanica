@@ -28,8 +28,8 @@ public class OSPecaRepository {
             
             while (result.next()) {
                 OSPeca osPeca = new OSPeca();
-                osPeca.setOrdemServico(new OSRepository().OrdemServicoById(result.getInt("OrdemServico")));
-                osPeca.setPeca(new PecaRepository().getPecaById(result.getInt("Peca")));
+                osPeca.setOrdemServico(new OSRepository().OrdemServicoById(result.getInt("id_os")));
+                osPeca.setPeca(new PecaRepository().getPecaById(result.getInt("id_pecas")));
                 osPecasList.add(osPeca);
             }
         } catch (SQLException e) {

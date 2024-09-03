@@ -128,7 +128,7 @@ public class PecaRepository {
     }
 
     public Peca getPecaById(int id) {
-        String sql = "SELECT * FROM Peca WHERE id = ?";
+        String sql = "SELECT * FROM pecas WHERE id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, id);
             ResultSet result = stmt.executeQuery();

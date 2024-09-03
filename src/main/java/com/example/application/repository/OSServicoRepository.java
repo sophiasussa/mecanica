@@ -27,8 +27,8 @@ public class OSServicoRepository {
             
             while (result.next()) {
                 OSServico osServico = new OSServico();
-                osServico.setOrdemServico(new OSRepository().OrdemServicoById(result.getInt("OrdemServico")));
-                osServico.setServico(new ServicosRepository().getServicoById(result.getInt("Servico")));
+                osServico.setOrdemServico(new OSRepository().OrdemServicoById(result.getInt("id_os")));
+                osServico.setServico(new ServicosRepository().getServicoById(result.getInt("id_servicos")));
                 osServicoList.add(osServico);
             }
         } catch (SQLException e) {

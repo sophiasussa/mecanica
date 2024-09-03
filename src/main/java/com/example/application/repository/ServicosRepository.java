@@ -132,7 +132,7 @@ public class ServicosRepository {
             if (result.next()) {
                 Servicos servico = new Servicos();
                 servico.setId(result.getInt("id"));
-                servico.setDescricaoServico(result.getString("descricaoServico"));
+                servico.setDescricaoServico(result.getString("descricao_servico"));
                 servico.setPreco(result.getDouble("preco"));
     
                 return servico;
