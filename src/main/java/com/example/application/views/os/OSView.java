@@ -2,6 +2,7 @@ package com.example.application.views.os;
 
 import com.example.application.repository.PecaRepository;
 import com.example.application.views.MainLayout;
+import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -421,4 +422,39 @@ public class OSView extends Composite<VerticalLayout> {
 
         grid.setItems(oss);
     }
+
+    private void configureValorTotalCalculation() {
+    // Adiciona listener para quando as peças são selecionadas/desmarcadas
+    comboBox4.addValueChangeListener(event -> calculateAndSetValorTotal());
+
+    // Adiciona listener para quando os serviços são selecionados/desmarcados
+    comboBox5.addValueChangeListener(event -> calculateAndSetValorTotal());
+}
+
+private void calculateAndSetValorTotal() {
+    // Obtém a lista de peças e serviços selecionados
+    Set<Peca> selectedPecas = comboBox4.getSelectedItems();
+    Set<Servicos> selectedServicos = comboBox5.getSelectedItems();
+
+    // Calcula o valor total
+    double valorTotal = 0.0;
+
+    for (Peca peca : selectedPecas) {
+        valorTotal += peca.getPreco(); // Supondo que o método getPreco() retorna o preço da peça
+    }
+
+    for (Servicos servico : selectedServicos) {
+        valorTotal += servico.getPreco(); // Supondo que o método getPrecoServico() retorna o preço do serviço
+    }
+
+    // Atualiza o campo de valor total
+    textField2.setValue(String.valueOf(valorTotal));
+}
+
+@Override
+protected void onAttach(AttachEvent attachEvent) {
+    super.onAttach(attachEvent);
+    configureValorTotalCalculation();
+}
+
 }
