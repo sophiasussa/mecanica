@@ -14,18 +14,19 @@ public class UserView extends Div {
     private UserController userController = new UserController();
 
     public UserView() {
-        // Verifica se o usuário já está autenticado
         User currentUser = (User) UI.getCurrent().getSession().getAttribute(User.class);
         if (currentUser != null) {
-            // Se o usuário já está autenticado, redireciona para a tela principal
             getUI().ifPresent(ui -> ui.navigate(""));
             return;
         }
 
         getStyle()
-            .set("background-color", "var(--lumo-contrast-5pct)")
+            .set("background-color", "var(--lumo-contrast-20pct)")
             .set("display", "flex")
+            .set("flex-direction", "column")
             .set("justify-content", "center")
+            .set("align-items", "center")
+            .set("height", "100vh")
             .set("padding", "var(--lumo-space-l)");
 
         LoginForm loginForm = new LoginForm();
@@ -35,23 +36,42 @@ public class UserView extends Div {
 
             User user = userController.login(username, password);
             if (user != null) {
-                // Login bem-sucedido: armazene o usuário na sessão e redirecione
                 getUI().ifPresent(ui -> {
                     ui.getSession().setAttribute(User.class, user);
-                    ui.navigate("");  // Redireciona para a MainView ou outra tela padrão
+                    ui.navigate("");
                 });
             } else {
-                // Falha no login: mostre uma mensagem de erro
                 loginForm.setError(true);
             }
         });
 
-        add(loginForm);
         loginForm.getElement().setAttribute("no-autofocus", "");
+
+        loginForm.getStyle()
+            .set("width", "100%")
+            .set("max-width", "400px");
+
+        Div registerButtonContainer = new Div();
+        registerButtonContainer.getStyle()
+            .set("text-align", "center")
+            .set("margin-top", "var(--lumo-space-s)");
 
         Button registerButton = new Button("Register", e -> {
             getUI().ifPresent(ui -> ui.navigate("register"));
         });
-        add(registerButton);
+
+        registerButton.getStyle()
+            .set("background-color", "var(--lumo-primary-color)")
+            .set("color", "white");
+
+        registerButtonContainer.add(registerButton);
+
+        Div loginJunto = new Div(loginForm, registerButtonContainer);
+        loginJunto.getStyle()
+            .set("display", "flex")
+            .set("flex-direction", "column")
+            .set("align-items", "center");
+
+        add(loginJunto);
     }
 }
