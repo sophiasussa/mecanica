@@ -156,7 +156,6 @@ public class OSView extends Composite<VerticalLayout> {
         layoutRow.setHeight("70px");
         layoutRow.setAlignItems(Alignment.END);
         layoutRow.setJustifyContentMode(JustifyContentMode.END);
-        textField3.setPlaceholder("Pesquisar");
         textField3.addClassName("rounded-text-field");
         textField3.setWidth("min-content");
         hr.getStyle().set("box-shadow", "0 1px 4px rgba(0, 0, 0, 0.2)");

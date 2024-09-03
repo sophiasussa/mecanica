@@ -13,6 +13,7 @@ import com.vaadin.flow.component.html.Hr;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
+import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
@@ -43,7 +44,6 @@ public class ClienteView extends Composite<VerticalLayout> {
     private Button buttonPrimary2; // Botão de pesquisa
 
     public ClienteView() {
-
         // // Verifica se o usuário está autenticado
         // User user = (User) getUI().get().getSession().getAttribute(User.class);
         // if (user == null) {
@@ -66,8 +66,11 @@ public class ClienteView extends Composite<VerticalLayout> {
         Hr hr = new Hr();
         HorizontalLayout layoutRow = new HorizontalLayout();
         textField6 = new TextField(); // Inicializa o campo de pesquisa
+        textField6.addClassName("rounded-text-field");
         buttonPrimary2 = new Button(); // Inicializa o botão de pesquisa
         Hr hr2 = new Hr();
+        hr.getStyle().set("box-shadow", "0 1px 4px rgba(0, 0, 0, 0.2)");
+        hr2.getStyle().set("box-shadow", "0 -1px 4px rgba(0, 0, 0, 0.2)");
 
         // Configurações do layout
         getContent().setWidth("100%");
@@ -110,6 +113,7 @@ public class ClienteView extends Composite<VerticalLayout> {
         layoutColumn2.add(buttonPrimary);
         layoutColumn2.add(hr);
         layoutColumn2.add(layoutRow);
+        layoutColumn2.setAlignItems(Alignment.END);
 
         layoutRow.add(textField6);
         layoutRow.add(buttonPrimary2);

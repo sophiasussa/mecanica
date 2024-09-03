@@ -115,7 +115,6 @@ public class PeçasView extends Composite<VerticalLayout> {
         layoutRow3.setHeight("70px");
         layoutRow3.setAlignItems(Alignment.END);
         layoutRow3.setJustifyContentMode(JustifyContentMode.END);
-        textField3.setPlaceholder("Pesquisar");
         textField3.setWidth("min-content");
         textField3.addClassName("rounded-text-field");
         buttonPrimary2.setIcon(VaadinIcon.SEARCH.create());

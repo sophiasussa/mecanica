@@ -55,7 +55,8 @@ public class VeiculoView extends Composite<VerticalLayout> {
     public VeiculoView() {
         veiculosController = new VeiculosController();
         clienteController = new ClienteController();
-
+        Hr hr = new Hr();
+        Hr hr2 = new Hr();
         // Formulário
         FormLayout formLayout3Col = new FormLayout();
         descricaoField = new TextField("Descrição");
@@ -72,6 +73,7 @@ public class VeiculoView extends Composite<VerticalLayout> {
 
         // Dropdown para Clientes
         clienteComboBox = new ComboBox<>("Cliente");
+        clienteComboBox.addClassName("rounded-text-field");
         List<Cliente> clientes = veiculosController.getAllClientes();
         if (clientes != null) {
             clienteComboBox.setItems(clientes);
@@ -123,7 +125,7 @@ public class VeiculoView extends Composite<VerticalLayout> {
         saveButton.addClickListener(e -> saveOrUpdateVeiculo());
 
         // Botão de pesquisa
-        searchField = new TextField("Pesquisar");
+        searchField = new TextField();
         searchField.addClassName("rounded-text-field");
         searchButton = new Button(VaadinIcon.SEARCH.create());
         searchButton.getStyle().set("border-radius", "50%");
@@ -131,9 +133,12 @@ public class VeiculoView extends Composite<VerticalLayout> {
         searchButton.addClickListener(e -> searchVeiculos());
 
         // Layout para os botões
-        VerticalLayout buttonLayout = new VerticalLayout(saveButton, new Hr(), new HorizontalLayout(searchField, searchButton), new Hr());
+        VerticalLayout buttonLayout = new VerticalLayout(saveButton, hr, new HorizontalLayout(searchField, searchButton), hr2);
         buttonLayout.setAlignItems(Alignment.END);
         buttonLayout.setWidthFull();
+
+        hr.getStyle().set("box-shadow", "0 1px 4px rgba(0, 0, 0, 0.2)");
+        hr2.getStyle().set("box-shadow", "0 -1px 4px rgba(0, 0, 0, 0.2)");
 
         // Grid para listar os veículos
         grid = createGrid();
