@@ -111,35 +111,55 @@ public class OSView extends Composite<VerticalLayout> {
         comboBox.setPlaceholder("Cliente");
         comboBox.setWidth("min-content");
         comboBox.addClassName("rounded-text-field");
+        comboBox.setRequiredIndicatorVisible(true);
+
         setComboBoxClienteData(comboBox);
         comboBox2.setPlaceholder("Mecanico");
         comboBox2.setWidth("min-content");
         comboBox2.addClassName("rounded-text-field");
+        comboBox2.setRequiredIndicatorVisible(true);
+
         setComboBoxMecanicoData(comboBox2);
         comboBox3.setPlaceholder("Veiculo");
         comboBox3.setWidth("min-content");
         comboBox3.addClassName("rounded-text-field");
+        comboBox3.setRequiredIndicatorVisible(true);
+
         setComboBoxVeiculoData(comboBox3);
         comboBox4.setPlaceholder("Peças");
         comboBox4.setWidth("min-content");
         comboBox4.addClassName("rounded-text-field");
+        comboBox4.setRequiredIndicatorVisible(true);
+
         setComboBoxPecaData(comboBox4);
         comboBox5.setPlaceholder("Serviços");
         comboBox5.setWidth("min-content");
         comboBox5.addClassName("rounded-text-field");
+        comboBox5.setRequiredIndicatorVisible(true);
+
         setComboBoxServicoData(comboBox5);
         textField.setPlaceholder("Número da OS");
         textField.addClassName("rounded-text-field");
         textField.setWidth("min-content");
+        textField.setRequiredIndicatorVisible(true);
+
         textField2.setPlaceholder("Valor Total");
+        textField2.setReadOnly(true);
         textField2.setWidth("min-content");
         textField2.addClassName("rounded-text-field");
+        textField2.setRequiredIndicatorVisible(true);
+
         datePicker.setPlaceholder("Data de Abertura");
         datePicker.setWidth("min-content");
         datePicker.addClassName("rounded-text-field");
+        datePicker.setRequiredIndicatorVisible(true);
+
         datePicker2.setPlaceholder("Data de Encerramento");
         datePicker2.setWidth("min-content");
         datePicker2.addClassName("rounded-text-field");
+        datePicker2.setRequiredIndicatorVisible(true);
+
+                        
         layoutColumn2.setWidthFull();
         getContent().setFlexGrow(1.0, layoutColumn2);
         layoutColumn2.setWidth("100%");

@@ -17,6 +17,7 @@ import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
@@ -51,6 +52,7 @@ public class ClienteView extends Composite<VerticalLayout> {
         //     getUI().ifPresent(ui -> ui.navigate("login"));
         //     return; // Interrompe a execução do construtor se o usuário não estiver autenticado
         // }
+
         clienteController = new ClienteController();
 
         // Formulário
@@ -76,9 +78,15 @@ public class ClienteView extends Composite<VerticalLayout> {
         getContent().setWidth("100%");
         getContent().getStyle().set("flex-grow", "1");
         formLayout2Col.setWidth("100%");
+
+
         textField.setPlaceholder("Nome");
         textField.addClassName("rounded-text-field");
         textField.setWidth("min-content");
+        textField.setRequiredIndicatorVisible(true);
+
+
+
         textField2.setPlaceholder("Endereço");
         textField2.addClassName("rounded-text-field");
         textField2.setWidth("min-content");
@@ -91,9 +99,14 @@ public class ClienteView extends Composite<VerticalLayout> {
         textField4.setPlaceholder("Cidade");
         textField4.addClassName("rounded-text-field");
         textField4.setWidth("min-content");
+
+
         textField5.setPlaceholder("Telefone");
         textField5.addClassName("rounded-text-field");
         textField5.setWidth("min-content");
+        textField5.setRequiredIndicatorVisible(true); // Telefone
+
+
 
         buttonPrimary.setText("Salvar");
         buttonPrimary.getStyle().set("border-radius", "25px");
