@@ -1,5 +1,6 @@
 package controller;
 
+import model.Cliente;
 import model.Mecanico;
 import java.util.List;
 
@@ -44,13 +45,16 @@ public class MecanicoController {
         }
     }
 
+    public boolean isMecanicoInUse(Mecanico mecanico) {
+        return mecanicoRepository.isMecanicoInUse(mecanico);
+    }
+
     public boolean deleteMecanico(Mecanico mecanico) {
-        try {
-            return mecanicoRepository.delete(mecanico);
-        } catch (Exception e) {
-            e.printStackTrace();
+        if (isMecanicoInUse(mecanico)) {
+            System.out.println("Não é possível excluir o mecanico. O mecanico está associado a um ou mais OSs.");
             return false;
         }
+        return mecanicoRepository.delete(mecanico);
     }
 
     public Mecanico getMecanicoById(int id) {

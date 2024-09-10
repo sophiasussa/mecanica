@@ -112,8 +112,8 @@ public class MecanicoRepository {
         }
     }
 
-    private boolean isMecanicoInUse(Mecanico mecanico) {
-        String sql = "SELECT COUNT(*) FROM Os WHERE mecanico_id = ?";
+    public boolean isMecanicoInUse(Mecanico mecanico) {
+        String sql = "SELECT COUNT(*) FROM Os WHERE id_mecanico = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, mecanico.getId());
             ResultSet result = stmt.executeQuery();

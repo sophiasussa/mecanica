@@ -20,6 +20,7 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
 import controller.MecanicoController;
+import model.Cliente;
 import model.Mecanico;
 
 import java.util.List;
@@ -213,13 +214,35 @@ public class MecanicoView extends Composite<VerticalLayout> {
         grid.setItems(mecanicos);
     }
 
-    private void deleteMecanico(Mecanico mecanico) {
-        boolean success = mecanicoController.deleteMecanico(mecanico);
-        if (success) {
-            refreshGrid();
-        } else {
-            System.out.println("Erro ao excluir mecânico.");
+    // private void deleteMecanico(Mecanico mecanico) {
+    //     boolean success = mecanicoController.deleteMecanico(mecanico);
+    //     if (success) {
+    //         refreshGrid();
+    //     } else {
+    //         System.out.println("Erro ao excluir mecânico.");
+    //     }
+    // }
+
+    public boolean deleteMecanico(Mecanico mecanico) {
+        if (mecanicoController.isMecanicoInUse(mecanico)) {
+            // Exibe uma notificação ao usuário informando que o mecanico está associado a veículos
+            Notification.show("Não é possível excluir o mecanico. O mecanico está associado a um ou mais veículos.");
+            return false;
         }
+        
+        boolean isDeleted = mecanicoController.deleteMecanico(mecanico);
+        
+        if (isDeleted) {
+            // Atualiza a grid para refletir a exclusão do mecanico
+            refreshGrid();
+            // Exibe uma notificação ao usuário confirmando a exclusão
+            Notification.show("Mecanico excluído com sucesso.");
+        } else {
+            // Se houver algum erro na exclusão, exibe uma notificação ao usuário
+            Notification.show("Erro ao excluir o mecanico.");
+        }
+        
+        return isDeleted;
     }
 
     private void editMecanico(Mecanico mecanico) {
