@@ -130,6 +130,9 @@ public class MecanicoView extends Composite<VerticalLayout> {
 
     private Grid<Mecanico> createGrid() {
         grid = new Grid<>(Mecanico.class, false);
+        grid.getStyle().set("border-radius", "15px");
+        grid.getStyle().set("overflow", "hidden");
+        grid.setAllRowsVisible(true);
         grid.addColumn(Mecanico::getNome).setHeader("Nome").setSortable(true);
         grid.addColumn(Mecanico::getEndereco).setHeader("Endereço").setSortable(true);
         grid.addColumn(Mecanico::getCpf).setHeader("CPF").setSortable(true);

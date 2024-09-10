@@ -10,14 +10,17 @@ import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.html.Footer;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.Header;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.Scroller;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.sidenav.SideNav;
 import com.vaadin.flow.component.sidenav.SideNavItem;
 import com.vaadin.flow.router.BeforeEnterEvent;
@@ -51,14 +54,7 @@ public class MainLayout extends AppLayout implements BeforeEnterObserver {
         viewTitle = new H1();
         viewTitle.addClassNames(LumoUtility.FontSize.LARGE, LumoUtility.Margin.NONE);
 
-        Button logoutButton = new Button("Logout", event -> {
-            // Remove o usuário da sessão
-            UI.getCurrent().getSession().setAttribute(User.class, null);
-            // Redireciona para a tela de login
-            UI.getCurrent().navigate("login");
-        });
-
-        HorizontalLayout headerLayout = new HorizontalLayout(toggle, viewTitle, logoutButton);
+        HorizontalLayout headerLayout = new HorizontalLayout(toggle, viewTitle);
         headerLayout.setDefaultVerticalComponentAlignment(Alignment.CENTER);
         headerLayout.expand(viewTitle);
         headerLayout.setWidthFull();
@@ -71,10 +67,36 @@ public class MainLayout extends AppLayout implements BeforeEnterObserver {
         appName.addClassNames(LumoUtility.FontWeight.SEMIBOLD, LumoUtility.FontSize.LARGE);
         Header header = new Header(appName);
 
-        Scroller scroller = new Scroller(createNavigation());
+        SideNav sideNav = createNavigation();
+    
+        Scroller scroller = new Scroller(sideNav);
+    
+        Button logoutButton = new Button("Logout", VaadinIcon.EXIT.create(), event -> {
 
-        addToDrawer(header, scroller, createFooter());
+            UI.getCurrent().getSession().setAttribute(User.class, null);
+            UI.getCurrent().navigate("login");
+        });
+        logoutButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+        logoutButton.getStyle().set("width", "100%"); 
+
+        VerticalLayout footer = new VerticalLayout(logoutButton);
+        footer.setPadding(false);
+        footer.setSpacing(false);
+        footer.setWidthFull();
+        footer.setJustifyContentMode(FlexComponent.JustifyContentMode.END);
+    
+        VerticalLayout drawerContent = new VerticalLayout(header, scroller, footer);
+        drawerContent.setSpacing(true); 
+        drawerContent.setPadding(true); 
+        drawerContent.setSizeFull(); 
+        drawerContent.setAlignItems(FlexComponent.Alignment.STRETCH); 
+
+        drawerContent.setFlexGrow(1, scroller);
+    
+        addToDrawer(drawerContent);
     }
+    
+
 
     private SideNav createNavigation() {
         SideNav nav = new SideNav();

@@ -83,7 +83,9 @@ public class ServiçosView  extends Composite<VerticalLayout> {
 
     private Grid<Servicos> createGrid() {
         grid = new Grid<>(Servicos.class, false);
-    
+        grid.getStyle().set("border-radius", "15px");
+        grid.getStyle().set("overflow", "hidden");
+        grid.setAllRowsVisible(true);
         // Formatador para moeda em Real
         NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(new Locale("pt", "BR"));
     

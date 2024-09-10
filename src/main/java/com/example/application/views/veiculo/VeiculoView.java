@@ -149,6 +149,9 @@ public class VeiculoView extends Composite<VerticalLayout> {
 
     private Grid<Veiculo> createGrid() {
         grid = new Grid<>(Veiculo.class, false);
+        grid.getStyle().set("border-radius", "15px");
+        grid.getStyle().set("overflow", "hidden");
+        grid.setAllRowsVisible(true);
         grid.addColumn(Veiculo::getDescricaoVeiculo).setHeader("Descrição").setSortable(true);
         grid.addColumn(Veiculo::getPlaca).setHeader("Placa").setSortable(true);
         grid.addColumn(Veiculo::getAnoModelo).setHeader("Ano").setSortable(true);

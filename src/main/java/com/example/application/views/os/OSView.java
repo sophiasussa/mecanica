@@ -248,6 +248,9 @@ public class OSView extends Composite<VerticalLayout> {
 
     private Grid<OrdemServico> createGrid() {
         grid = new Grid<>(OrdemServico.class, false);
+        grid.getStyle().set("border-radius", "15px");
+        grid.getStyle().set("overflow", "hidden");
+        grid.setAllRowsVisible(true);
 
         NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(new Locale("pt", "BR"));
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");

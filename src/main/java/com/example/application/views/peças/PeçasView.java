@@ -292,6 +292,9 @@ public class PeçasView extends Composite<VerticalLayout> {
 
     private Grid<Peca> createGrid() {
         grid = new Grid<>(Peca.class, false);
+        grid.getStyle().set("border-radius", "15px");
+        grid.getStyle().set("overflow", "hidden");
+        grid.setAllRowsVisible(true);
         // Formatador para moeda em Real
         NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(new Locale("pt", "BR"));
 

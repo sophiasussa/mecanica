@@ -151,6 +151,9 @@ public class ClienteView extends Composite<VerticalLayout> {
 
     private Grid<Cliente> createGrid() {
         grid = new Grid<>(Cliente.class, false);
+        grid.getStyle().set("border-radius", "15px");
+        grid.getStyle().set("overflow", "hidden");
+        grid.setAllRowsVisible(true);
         grid.addColumn(Cliente::getNome).setHeader("Nome").setSortable(true);
         grid.addColumn(Cliente::getEndereco).setHeader("Endereço").setSortable(true);
         grid.addColumn(Cliente::getCpf).setHeader("CPF").setSortable(true);
