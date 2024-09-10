@@ -18,7 +18,8 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import controller.ServicosController;
 import model.Servicos;
-
+import java.text.NumberFormat;
+import java.util.Locale;
 import java.util.List;
 
 @PageTitle("Serviços")
@@ -82,43 +83,54 @@ public class ServiçosView  extends Composite<VerticalLayout> {
 
     private Grid<Servicos> createGrid() {
         grid = new Grid<>(Servicos.class, false);
-        grid.addColumn(Servicos::getDescricaoServico).setHeader("Descrição").setSortable(true);
-        grid.addColumn(Servicos::getPreco).setHeader("Valor").setSortable(true);
-
+    
+        // Formatador para moeda em Real
+        NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(new Locale("pt", "BR"));
+    
+        grid.addColumn(servico -> currencyFormat.format(servico.getPreco()))
+            .setHeader("Valor")
+            .setSortable(true);
+    
+        grid.addColumn(Servicos::getDescricaoServico)
+            .setHeader("Descrição")
+            .setSortable(true);
+    
         grid.addComponentColumn(servico -> {
             Button deleteButton = new Button(VaadinIcon.TRASH.create(), e -> deleteServico(servico));
             deleteButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
             return deleteButton;
         }).setHeader("Ações");
-
+    
         grid.addItemDoubleClickListener(e -> editServico(e.getItem()));
-
+    
         grid.setItems(servicosController.getAllServicos());
         grid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
-
+    
         return grid;
     }
+    
 
     private void saveOrUpdateServico() {
         String descricao = descricaoField.getValue();
         double preco;
-
+    
+        // Tentativa de converter o valor digitado para double
         try {
             preco = Double.parseDouble(precoField.getValue());
         } catch (NumberFormatException e) {
             Notification.show("Valor inválido.");
             return;
         }
-
+    
         if (descricao == null || descricao.isEmpty()) {
             Notification.show("Descrição não pode estar vazia.");
             return;
         }
-
+    
         Servicos servico = new Servicos();
         servico.setDescricaoServico(descricao);
-        servico.setPreco(preco);
-
+        servico.setPreco(preco);  // Salva o valor como número
+    
         boolean success;
         if (servicoId != null && servicoId > 0) {
             servico.setId(servicoId);
@@ -136,12 +148,13 @@ public class ServiçosView  extends Composite<VerticalLayout> {
                 Notification.show("Falha ao salvar o serviço.");
             }
         }
-
+    
         if (success) {
             clearForm();
             refreshGrid();
         }
     }
+    
 
     private void searchServicos() {
         String searchTerm = searchField.getValue();

@@ -35,6 +35,8 @@ import java.util.List;
 import model.Marca;
 import model.Peca;
 import model.Servicos;
+import java.text.NumberFormat;
+import java.util.Locale;
 
 @PageTitle("Peças")
 @Route(value = "my-view3", layout = MainLayout.class)
@@ -290,8 +292,15 @@ public class PeçasView extends Composite<VerticalLayout> {
 
     private Grid<Peca> createGrid() {
         grid = new Grid<>(Peca.class, false);
+        // Formatador para moeda em Real
+        NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(new Locale("pt", "BR"));
+
         grid.addColumn(Peca::getDescricao).setHeader("Descrição").setSortable(true);
-        grid.addColumn(Peca::getPreco).setHeader("Valor").setSortable(true);
+
+        grid.addColumn(peca -> currencyFormat.format(peca.getPreco()))
+        .setHeader("Valor")
+        .setSortable(true);
+
         grid.addColumn(peca -> peca.getMarca().getId()).setHeader("Marca").setSortable(true);
 
         grid.addComponentColumn(peca -> {
@@ -312,7 +321,12 @@ public class PeçasView extends Composite<VerticalLayout> {
         String descricao = textField.getValue();
         double preco;
         Marca marcaSelecionada = comboBox.getValue();
-
+        try {
+            preco = Double.parseDouble(textField2.getValue());
+        } catch (NumberFormatException e) {
+            Notification.show("Valor inválido.");
+            return;
+        }
         if (marcaSelecionada == null) {
             Notification.show("Você deve selecionar uma marca.");
             return;

@@ -51,9 +51,12 @@ import java.util.stream.Collectors;
 import java.util.HashSet;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
+import java.text.NumberFormat;
+import java.util.Locale;
 @PageTitle("Ordem de Serviço")
 @Route(value = "my-view5", layout = MainLayout.class)
 public class OSView extends Composite<VerticalLayout> {
@@ -111,53 +114,56 @@ public class OSView extends Composite<VerticalLayout> {
         comboBox.setPlaceholder("Cliente");
         comboBox.setWidth("min-content");
         comboBox.addClassName("rounded-text-field");
-        comboBox.setRequiredIndicatorVisible(true);
+     
 
         setComboBoxClienteData(comboBox);
         comboBox2.setPlaceholder("Mecanico");
         comboBox2.setWidth("min-content");
         comboBox2.addClassName("rounded-text-field");
-        comboBox2.setRequiredIndicatorVisible(true);
+      
 
         setComboBoxMecanicoData(comboBox2);
         comboBox3.setPlaceholder("Veiculo");
         comboBox3.setWidth("min-content");
         comboBox3.addClassName("rounded-text-field");
-        comboBox3.setRequiredIndicatorVisible(true);
+      
 
         setComboBoxVeiculoData(comboBox3);
         comboBox4.setPlaceholder("Peças");
         comboBox4.setWidth("min-content");
         comboBox4.addClassName("rounded-text-field");
-        comboBox4.setRequiredIndicatorVisible(true);
+      
 
         setComboBoxPecaData(comboBox4);
         comboBox5.setPlaceholder("Serviços");
         comboBox5.setWidth("min-content");
         comboBox5.addClassName("rounded-text-field");
-        comboBox5.setRequiredIndicatorVisible(true);
+      
 
         setComboBoxServicoData(comboBox5);
         textField.setPlaceholder("Número da OS");
         textField.addClassName("rounded-text-field");
         textField.setWidth("min-content");
-        textField.setRequiredIndicatorVisible(true);
+      
 
         textField2.setPlaceholder("Valor Total");
         textField2.setReadOnly(true);
         textField2.setWidth("min-content");
         textField2.addClassName("rounded-text-field");
-        textField2.setRequiredIndicatorVisible(true);
+       
 
         datePicker.setPlaceholder("Data de Abertura");
         datePicker.setWidth("min-content");
         datePicker.addClassName("rounded-text-field");
-        datePicker.setRequiredIndicatorVisible(true);
+       
 
         datePicker2.setPlaceholder("Data de Encerramento");
         datePicker2.setWidth("min-content");
         datePicker2.addClassName("rounded-text-field");
-        datePicker2.setRequiredIndicatorVisible(true);
+        
+        // DatePicker.DatePickerI18n dateI18n = new DatePicker.DatePickerI18n()
+        // .setDateFormat("dd/MM/yyyy");
+        // datePicker.setI18n(dateI18n);
 
                         
         layoutColumn2.setWidthFull();
@@ -242,10 +248,29 @@ public class OSView extends Composite<VerticalLayout> {
 
     private Grid<OrdemServico> createGrid() {
         grid = new Grid<>(OrdemServico.class, false);
+
+        NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(new Locale("pt", "BR"));
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
         grid.addColumn(OrdemServico::getNumeroOS).setHeader("NumeroOS").setSortable(true);
-        grid.addColumn(OrdemServico::getDataAbertura).setHeader("Abertura").setSortable(true);
-        grid.addColumn(OrdemServico::getDataEncerramento).setHeader("Encerramento").setSortable(true);
-        grid.addColumn(OrdemServico::getValorTotal).setHeader("Valor").setSortable(true);
+        // Formatar e exibir a data de abertura
+        grid.addColumn(ordemServico -> ordemServico.getDataAbertura() != null 
+        ? ordemServico.getDataAbertura().format(formatter) 
+        : "")
+        .setHeader("Abertura")
+        .setSortable(true);
+
+        // Formatar e exibir a data de encerramento
+        grid.addColumn(ordemServico -> ordemServico.getDataEncerramento() != null 
+        ? ordemServico.getDataEncerramento().format(formatter) 
+        : "")
+        .setHeader("Encerramento")
+        .setSortable(true);
+
+        grid.addColumn(servico -> currencyFormat.format(servico.getValorTotal()))
+        .setHeader("Valor")
+        .setSortable(true);
+
         grid.addColumn(os -> os.getCliente().getNome()).setHeader("Cliente").setSortable(true);
         grid.addColumn(os -> os.getMecanico().getNome()).setHeader("Mecanico").setSortable(true);
         grid.addColumn(os -> os.getVeiculo().getDescricaoVeiculo()).setHeader("Veiculo").setSortable(true);
@@ -342,7 +367,12 @@ public class OSView extends Composite<VerticalLayout> {
         Veiculo veiculoSelecionado = comboBox3.getValue();
         List<Peca> osPecasList = new ArrayList<>(comboBox4.getValue());
         List<Servicos> osServicoList = new ArrayList<>(comboBox5.getValue());
-
+        try {
+            valorTotal = Double.parseDouble(textField2.getValue());
+            } catch (NumberFormatException e) {
+                Notification.show("Valor inválido.");
+                return;
+            }
 
 // Verificação dos campos
 if (textField.getValue() == null || textField.getValue().isEmpty()) {
