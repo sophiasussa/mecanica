@@ -343,6 +343,57 @@ public class OSView extends Composite<VerticalLayout> {
         List<Peca> osPecasList = new ArrayList<>(comboBox4.getValue());
         List<Servicos> osServicoList = new ArrayList<>(comboBox5.getValue());
 
+
+// Verificação dos campos
+if (textField.getValue() == null || textField.getValue().isEmpty()) {
+    Notification.show("O número da OS é obrigatório.");
+    return;
+} else {
+    numeroOS = Integer.parseInt(textField.getValue());
+}
+
+if (textField2.getValue() == null || textField2.getValue().isEmpty()) {
+    Notification.show("O valor total é obrigatório.");
+    return;
+} else {
+    valorTotal = Double.parseDouble(textField2.getValue());
+}
+
+if (data == null) {
+    Notification.show("A data inicial é obrigatória.");
+    return;
+}
+
+if (data2 == null) {
+    Notification.show("A data final é obrigatória.");
+    return;
+}
+
+if (clienteSelecionado == null) {
+    Notification.show("O cliente é obrigatório.");
+    return;
+}
+
+if (mecanicoSelecionado == null) {
+    Notification.show("O mecânico é obrigatório.");
+    return;
+}
+
+if (veiculoSelecionado == null) {
+    Notification.show("O veículo é obrigatório.");
+    return;
+}
+
+if (osPecasList == null || osPecasList.isEmpty()) {
+    Notification.show("As peças da OS são obrigatórias.");
+    return;
+}
+
+if (osServicoList == null || osServicoList.isEmpty()) {
+    Notification.show("Os serviços da OS são obrigatórios.");
+    return;
+}
+
         OrdemServico os = new OrdemServico();
         os.setNumeroOS(numeroOS);
         os.setValorTotal(valorTotal);

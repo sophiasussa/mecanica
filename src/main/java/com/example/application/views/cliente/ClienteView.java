@@ -83,7 +83,6 @@ public class ClienteView extends Composite<VerticalLayout> {
         textField.setPlaceholder("Nome");
         textField.addClassName("rounded-text-field");
         textField.setWidth("min-content");
-        textField.setRequiredIndicatorVisible(true);
 
 
 
@@ -104,7 +103,6 @@ public class ClienteView extends Composite<VerticalLayout> {
         textField5.setPlaceholder("Telefone");
         textField5.addClassName("rounded-text-field");
         textField5.setWidth("min-content");
-        textField5.setRequiredIndicatorVisible(true); // Telefone
 
 
 
@@ -180,10 +178,11 @@ public class ClienteView extends Composite<VerticalLayout> {
         String cidade = textField4.getValue();
         String telefone = textField5.getValue();
     
-        if (nome == null || nome.isEmpty() || endereco == null || endereco.isEmpty()) {
-            Notification.show("Nome e Endereço não podem estar vazios.");
-            return;
-        }
+        // Verifica se os campos nome e telefone estão preenchidos
+    if (nome == null || nome.isEmpty() || telefone == null || telefone.isEmpty()) {
+        Notification.show("Nome e Telefone são obrigatórios.");
+        return;
+    }
     
         Cliente cliente = new Cliente();
         cliente.setNome(nome);

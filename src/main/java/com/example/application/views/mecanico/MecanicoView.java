@@ -156,8 +156,8 @@ public class MecanicoView extends Composite<VerticalLayout> {
         String cidade = textField4.getValue();
         String telefone = textField5.getValue();
     
-        if (nome == null || nome.isEmpty() || endereco == null || endereco.isEmpty()) {
-            Notification.show("Nome e Endereço não podem estar vazios.");
+        if (nome == null || nome.isEmpty() || telefone == null || telefone.isEmpty()) {
+            Notification.show("Nome e Telefone são obrigatórios.");
             return;
         }
     
