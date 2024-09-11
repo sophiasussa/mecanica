@@ -47,6 +47,9 @@ public class VeiculoView extends Composite<VerticalLayout> {
     private Integer veiculoId;
     private String image;
 
+    private TextField imagemPathField;
+    // private Button downloadButton;
+
     public VeiculoView() {
         veiculosController = new VeiculosController();
         clienteController = new ClienteController();
@@ -73,29 +76,52 @@ public class VeiculoView extends Composite<VerticalLayout> {
         }
 
         // Upload de imagem
-        MemoryBuffer buffer = new MemoryBuffer();
-        Upload upload = new Upload(buffer);
-        upload.setAcceptedFileTypes("image/jpeg", "image/png", "image/gif");
-        upload.setMaxFiles(1);
-        upload.setMaxFileSize(5 * 1024 * 1024); // Limite de 5MB
+    MemoryBuffer buffer = new MemoryBuffer();
+    Upload upload = new Upload(buffer);
+    upload.setAcceptedFileTypes("image/jpeg", "image/png", "image/gif");
+    upload.setMaxFiles(1);
+    upload.setMaxFileSize(5 * 1024 * 1024); // Limite de 5MB
 
-        upload.addSucceededListener(event -> {
-            try {
-                String fileName = event.getFileName();
-                String uploadDir = "C:/Users/jorda/Downloads/imagensMecanica/"; // Diretório de upload
-                File targetFile = new File(uploadDir + fileName);
+    upload.addSucceededListener(event -> {
+        try {
+            String fileName = event.getFileName();
+            String uploadDir = "C:/Users/jorda/Downloads/imagensMecanica/"; // Diretório de upload
+            File targetFile = new File(uploadDir + fileName);
 
-                try (InputStream inputStream = buffer.getInputStream()) {
-                    Files.copy(inputStream, targetFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                }
-
-                image = targetFile.getAbsolutePath(); // Caminho absoluto da imagem
-                Notification.show("Imagem carregada com sucesso!", 3000, Notification.Position.MIDDLE);
-            } catch (IOException e) {
-                e.printStackTrace();
-                Notification.show("Falha ao fazer upload da imagem: " + e.getMessage(), 3000, Notification.Position.MIDDLE);
+            try (InputStream inputStream = buffer.getInputStream()) {
+                Files.copy(inputStream, targetFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
             }
-        });
+
+            image = targetFile.getAbsolutePath(); // Caminho absoluto da imagem
+            imagemPathField.setValue(image); // Atualiza o campo com o caminho da imagem
+            Notification.show("Imagem carregada com sucesso!", 3000, Notification.Position.MIDDLE);
+        } catch (IOException e) {
+            e.printStackTrace();
+            Notification.show("Falha ao fazer upload da imagem: " + e.getMessage(), 3000, Notification.Position.MIDDLE);
+        }
+    });
+
+    // Campo para exibir o caminho da imagem
+    imagemPathField = new TextField("Caminho da Imagem");
+    imagemPathField.setWidthFull();
+    imagemPathField.setReadOnly(true); // O campo é somente leitura
+
+    // // Botão para fazer download da imagem
+    // downloadButton = new Button("Download Imagem", VaadinIcon.DOWNLOAD.create());
+    // downloadButton.addClickListener(e -> {
+    //     if (image != null && !image.isEmpty()) {
+    //         File imageFile = new File(image);
+    //         if (imageFile.exists()) {
+    //             String filePath = imageFile.toURI().toString(); // Converte o caminho do arquivo para URI
+    //             getUI().ifPresent(ui -> ui.getPage().open(filePath, "_blank")); // Abre a imagem em uma nova aba
+    //         } else {
+    //             Notification.show("Arquivo não encontrado: " + image, 3000, Notification.Position.MIDDLE);
+    //         }
+    //     } else {
+    //         Notification.show("Nenhuma imagem para download.", 3000, Notification.Position.MIDDLE);
+    //     }
+    // });
+    
 
         // Configuração do layout do formulário
         formLayout.setResponsiveSteps(
@@ -103,7 +129,7 @@ public class VeiculoView extends Composite<VerticalLayout> {
             new ResponsiveStep("250px", 2),
             new ResponsiveStep("500px", 3)
         );
-        formLayout.add(descricaoField, placaField, anoField, clienteComboBox, upload);
+        formLayout.add(descricaoField, placaField, anoField, clienteComboBox, upload, imagemPathField);
 
         // Botão Salvar
         Button saveButton = new Button("Salvar");
@@ -240,9 +266,10 @@ public class VeiculoView extends Composite<VerticalLayout> {
         image = veiculo.getImagem();
     
         if (image != null && !image.isEmpty()) {
+            imagemPathField.setValue(image); // Atualiza o campo com o caminho da imagem
             Notification.show("Imagem atual: " + image, 3000, Notification.Position.MIDDLE);
-            // Opcionalmente, você pode exibir a imagem ou fornecer uma maneira de visualizar ou alterar a imagem
         } else {
+            imagemPathField.clear();
             Notification.show("Nenhuma imagem associada.", 3000, Notification.Position.MIDDLE);
         }
     }
